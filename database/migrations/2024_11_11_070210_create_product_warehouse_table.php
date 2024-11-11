@@ -11,21 +11,20 @@ return new class extends Migration
      */
     public function up()
 	{
-		Schema::create('warehouses', function (Blueprint $table) {
+		Schema::create('product_warehouse', function (Blueprint $table) {
 			$table->id();
-			$table->string('product_name');
+			$table->foreignId('product_id')->constrained()->onDelete('cascade');
+			$table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
 			$table->integer('quantity');
-			$table->decimal('price', 10, 2);
 			$table->timestamps();
 		});
 	}
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('warehouses');
+        Schema::dropIfExists('product_warehouse');
     }
 };
