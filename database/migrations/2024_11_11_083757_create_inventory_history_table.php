@@ -9,23 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
-	{
-		Schema::create('sales', function (Blueprint $table) {
+    public function up(): void
+    {
+        Schema::create('inventory_history', function (Blueprint $table) {
 			$table->id();
-			$table->string('customer_name');
-			$table->date('sale_date');
-			$table->decimal('total_amount', 10, 2)->default(0);
+			$table->foreignId('product_id')->constrained()->onDelete('cascade');
 			$table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
+			$table->integer('quantity');
+			$table->string('transaction_type'); // e.g., 'Purchase', 'Sale', 'Adjustment'
+			$table->text('notes')->nullable();
 			$table->timestamps();
 		});
-	}
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales');
+        Schema::dropIfExists('inventory_history');
     }
 };

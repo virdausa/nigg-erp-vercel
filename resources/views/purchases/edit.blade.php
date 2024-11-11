@@ -19,6 +19,16 @@
             <label for="total_amount">Total Amount</label>
             <input type="number" step="0.01" name="total_amount" class="form-control" value="{{ $purchase->total_amount }}" required>
         </div>
+		<div class="form-group">
+			<label for="warehouse_id">Select Warehouse</label>
+			<select name="warehouse_id" id="warehouse_id" class="form-control">
+				@foreach($warehouses as $warehouse)
+					<option value="{{ $warehouse->id }}" {{ $purchase->warehouse_id == $warehouse->id ? 'selected' : '' }}>
+						{{ $warehouse->name }}
+					</option>
+				@endforeach
+			</select>
+		</div>
 
         <h3>Products</h3>
         <div id="product-selection">

@@ -11,6 +11,7 @@
                 <th>ID</th>
                 <th>Supplier Name</th>
                 <th>Purchase Date</th>
+				<th>Warehouse</th>
                 <th>Total Amount</th>
 				<th>Product List</th>
 				<th>Actions</th>
@@ -22,6 +23,7 @@
 					<td>{{ $purchase->id }}</td>
 					<td>{{ $purchase->supplier_name }}</td>
 					<td>{{ $purchase->purchase_date }}</td>
+					<td>{{ $purchase->warehouse->name ?? 'Not Assigned' }}</td>
 					<td>{{ $purchase->total_amount }}</td>
 					<td>
 						@foreach ($purchase->products as $product)
@@ -29,6 +31,11 @@
 						@endforeach
 					</td>
 					<td>
+						@if ($purchase->is_transferred)
+							<span class="badge bg-success">Transferred</span>
+						@else
+							<a href="{{ route('purchases.transfer', $purchase->id) }}" class="btn btn-info">Transfer to Warehouse</a>
+						@endif
 						<a href="{{ route('purchases.edit', $purchase->id) }}" class="btn btn-warning">Edit</a>
 						<form action="{{ route('purchases.destroy', $purchase->id) }}" method="POST" style="display:inline;">
 							@csrf

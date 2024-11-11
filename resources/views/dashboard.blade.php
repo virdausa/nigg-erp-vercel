@@ -6,8 +6,21 @@
     <h1>Dashboard</h1>
     <p>Welcome to your business management app. Use the links below to navigate to different sections:</p>
 
-    <div class="list-group">
-        <a href="{{ route('purchases.index') }}" class="list-group-item list-group-item-action">Manage Purchases</a>
-        <a href="{{ route('products.index') }}" class="list-group-item list-group-item-action">Manage Products</a>
-    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <a href="{{ route('purchases.index') }}">Manage Purchases</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{{ route('products.index') }}">Manage Products</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{{ route('warehouses.index') }}">Manage Warehouses</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{{ route('inventory.index') }}">Manage Inventory</a>
+        </li>
+		<li class="list-group-item">
+            <a href="{{ route('sales.index') }}">Manage Sales</a>
+        </li>
+    </ul>
 @endsection
