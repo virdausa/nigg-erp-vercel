@@ -14,10 +14,6 @@
             <label for="purchase_date">Purchase Date</label>
             <input type="date" name="purchase_date" class="form-control" required>
         </div>
-        <div class="form-group">
-            <label for="total_amount">Total Amount</label>
-            <input type="number" step="0.01" name="total_amount" class="form-control" required>
-        </div>
 		<div class="form-group">
 			<label for="warehouse_id">Select Warehouse</label>
 			<select name="warehouse_id" id="warehouse_id" class="form-control">
@@ -38,6 +34,10 @@
 				</select>
 				<label for="quantity">Quantity</label>
 				<input type="number" name="products[0][quantity]" class="form-control" min="1" required>
+				
+				<!-- Buying Price Field -->
+				<label for="buying_price">Buying Price</label>
+				<input type="number" step="0.01" name="products[0][buying_price]" class="form-control" required>
 			</div>
 		</div>
 		<button type="button" id="add-product" class="btn btn-secondary">Add Another Product</button>
@@ -60,6 +60,10 @@
 				</select>
 				<label for="quantity">Quantity</label>
 				<input type="number" name="products[${productIndex}][quantity]" class="form-control" min="1" required>
+				
+				<!-- Buying Price Field for each dynamically added product -->
+				<label for="buying_price">Buying Price</label>
+				<input type="number" step="0.01" name="products[${productIndex}][buying_price]" class="form-control" required>
 			`;
 			productSelection.appendChild(newProductDiv);
 			productIndex++;

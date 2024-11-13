@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InventoryController;
@@ -12,6 +13,8 @@ Route::resource('products', ProductController::class);
 Route::resource('purchases', PurchaseController::class);
 Route::get('purchases/{purchase}/transfer', [PurchaseController::class, 'transferToWarehouse'])->name('purchases.transfer');
 Route::post('purchases/{purchase}/transfer', [PurchaseController::class, 'storeTransfer'])->name('purchases.transfer.store');
+Route::post('/purchases/{id}/update-status', [PurchaseController::class, 'updateStatus'])->name('purchases.updateStatus');
+
 
 Route::resource('sales', SalesController::class);
 Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
@@ -22,10 +25,16 @@ use App\Http\Controllers\InboundRequestController;
 use App\Http\Controllers\OutboundRequestController;
 
 Route::resource('warehouses', WarehouseController::class);
+Route::resource('locations', LocationController::class);
+
 // Inbound Requests
-Route::resource('inbound-requests', InboundRequestController::class);
+Route::resource('inbound_requests', InboundRequestController::class);
 Route::post('inbound-requests/{id}/approve', [InboundRequestController::class, 'approve'])->name('inbound-requests.approve');
 Route::post('inbound-requests/{id}/receive', [InboundRequestController::class, 'receive'])->name('inbound-requests.receive');
+Route::post('/inbound_requests/{id}/handle-discrepancy', [InboundRequestController::class, 'handleDiscrepancyAction'])->name('inbound_requests.handleDiscrepancyAction');
+Route::get('/inbound_requests/{id}/complete', [InboundRequestController::class, 'complete'])->name('inbound_requests.complete');
+Route::post('/inbound_requests/{id}/complete', [InboundRequestController::class, 'storeCompletion'])->name('inbound_requests.storeCompletion');
+
 
 // Outbound Requests
 Route::resource('outbound-requests', OutboundRequestController::class);

@@ -4,6 +4,8 @@
 
 @section('content')
     <h1>Edit Purchase</h1>
+
+    <!-- Main Purchase Update Form -->
     <form action="{{ route('purchases.update', $purchase->id) }}" method="POST">
         @csrf
         @method('PUT')
@@ -14,10 +16,6 @@
         <div class="form-group">
             <label for="purchase_date">Purchase Date</label>
             <input type="date" name="purchase_date" class="form-control" value="{{ $purchase->purchase_date }}" required>
-        </div>
-        <div class="form-group">
-            <label for="total_amount">Total Amount</label>
-            <input type="number" step="0.01" name="total_amount" class="form-control" value="{{ $purchase->total_amount }}" required>
         </div>
 		<div class="form-group">
 			<label for="warehouse_id">Select Warehouse</label>
@@ -30,6 +28,11 @@
 			</select>
 		</div>
 
+		<div class="form-group">
+			<label for="notes">Notes</label>
+			<textarea name="notes" class="form-control">{{ $purchase->notes }}</textarea>
+		</div>
+	
         <h3>Products</h3>
         <div id="product-selection">
             @foreach ($purchase->products as $index => $product)
@@ -44,12 +47,32 @@
                     </select>
                     <label for="quantity">Quantity</label>
                     <input type="number" name="products[{{ $index }}][quantity]" class="form-control" min="1" value="{{ $product->pivot->quantity }}" required>
-                </div>
+                
+					<!-- New Buying Price Field with existing value -->
+					<label for="buying_price">Buying Price</label>
+					<input type="number" step="0.01" name="products[{{ $index }}][buying_price]" class="form-control" value="{{ $product->pivot->buying_price }}" required>
+				</div>
             @endforeach
         </div>
         <button type="button" id="add-product" class="btn btn-secondary">Add Another Product</button>
         <button type="submit" class="btn btn-primary">Update Purchase</button>
         <a href="{{ route('purchases.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+
+    <!-- Separate Status Update Form -->
+    <form action="{{ route('purchases.updateStatus', $purchase->id) }}" method="POST" style="margin-top: 20px;">
+        @csrf
+        <div class="form-group">
+            <label for="status">Purchase Status</label>
+            <select name="status" class="form-control">
+                <option value="Planned" {{ $purchase->status == 'Planned' ? 'selected' : '' }}>Planned</option>
+                <option value="In Transit" {{ $purchase->status == 'In Transit' ? 'selected' : '' }}>In Transit</option>
+                <option value="Received - Pending Verification" {{ $purchase->status == 'Received - Pending Verification' ? 'selected' : '' }}>Received - Pending Verification</option>
+                <option value="Quantity Discrepancy" {{ $purchase->status == 'Quantity Discrepancy' ? 'selected' : '' }}>Quantity Discrepancy</option>
+                <option value="Completed" {{ $purchase->status == 'Completed' ? 'selected' : '' }}>Completed</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Status</button>
     </form>
 
     <script>
@@ -67,6 +90,10 @@
                 </select>
                 <label for="quantity">Quantity</label>
                 <input type="number" name="products[${productIndex}][quantity]" class="form-control" min="1" required>
+                
+                <!-- Buying Price Field for dynamically added products -->
+                <label for="buying_price">Buying Price</label>
+                <input type="number" step="0.01" name="products[${productIndex}][buying_price]" class="form-control" required>
             `;
             productSelection.appendChild(newProductDiv);
             productIndex++;

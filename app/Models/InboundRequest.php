@@ -12,6 +12,7 @@ class InboundRequest extends Model
     protected $fillable = [
         'purchase_order_id',
         'warehouse_id',
+		'requested_quantities',
         'received_quantities',
         'status',
         'verified_by',
@@ -19,10 +20,12 @@ class InboundRequest extends Model
     ];
 
     protected $casts = [
-        'received_quantities' => 'array',
-    ];
+		'received_quantities' => 'array',
+		'requested_quantities' => 'array', // Add this line
+	];
 
-    public function purchaseOrder()
+
+    public function purchase()
     {
         return $this->belongsTo(Purchase::class, 'purchase_order_id');
     }

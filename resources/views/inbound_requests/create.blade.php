@@ -1,60 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Create Inbound Request</h1>
-    <form action="{{ route('inbound-requests.store') }}" method="POST">
-        @csrf
-        <div class="form-group">
-            <label for="purchase_order_id">Purchase Order ID</label>
-            <select name="purchase_order_id" class="form-control">
-                @foreach($purchases as $purchase)
-                    <option value="{{ $purchase->id }}">{{ $purchase->id }} - {{ $purchase->supplier_name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="warehouse_id">Warehouse</label>
-            <select name="warehouse_id" class="form-control">
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div id="product-section">
-            <h3>Received Products</h3>
-            <div class="form-group">
-                <label for="product_id">Product</label>
-                <select name="received_quantities[0][product_id]" class="form-control">
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                    @endforeach
-                </select>
-                <label for="quantity">Quantity</label>
-                <input type="number" name="received_quantities[0][quantity]" class="form-control" min="1" required>
-            </div>
-        </div>
-        <button type="button" id="add-product" class="btn btn-secondary">Add Another Product</button>
-        <button type="submit" class="btn btn-primary">Create Inbound Request</button>
-    </form>
+    <h2>Create Inbound Request</h2>
 
-    <script>
-        let productIndex = 1;
-        document.getElementById('add-product').addEventListener('click', function () {
-            const productSection = document.getElementById('product-section');
-            const newProductDiv = document.createElement('div');
-            newProductDiv.classList.add('form-group');
-            newProductDiv.innerHTML = `
-                <label for="product_id">Product</label>
-                <select name="received_quantities[${productIndex}][product_id]" class="form-control">
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                    @endforeach
-                </select>
-                <label for="quantity">Quantity</label>
-                <input type="number" name="received_quantities[${productIndex}][quantity]" class="form-control" min="1" required>
-            `;
-            productSection.appendChild(newProductDiv);
-            productIndex++;
-        });
-    </script>
+    <form action="{{ route('inbound_requests.store') }}" method="POST">
+        @csrf
+
+        <div class="form-group">
+            <label for="purchase_order_id">Purchase Order</label>
+            <input type="text" class="form-control" name="purchase_order_id" value="{{ $purchase->id }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="warehouse_id">Select Warehouse</label>
+            <select name="warehouse_id" class="form-control" required>
+                <option value="{{ $purchase->warehouse_id }}" selected>{{ $purchase->warehouse->name }}</option>
+            </select>
+        </div>
+
+        <h3>Received Quantities</h3>
+        @foreach($purchase->products as $product)
+            <div class="form-group">
+                <label for="received_quantities[{{ $product->id }}]">{{ $product->name }}</label>
+                <input type="number" name="received_quantities[{{ $product->id }}]" class="form-control" min="0" placeholder="Enter quantity received">
+            </div>
+        @endforeach
+
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea name="notes" class="form-control" placeholder="Optional notes"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Inbound Request</button>
+        <a href="{{ route('inbound_requests.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
 @endsection

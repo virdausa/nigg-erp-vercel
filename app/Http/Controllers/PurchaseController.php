@@ -6,6 +6,7 @@ use App\Models\Purchase; // Ensure you import the Purchase model
 use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\InventoryHistory;
+use App\Models\InboundRequest;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
@@ -26,23 +27,48 @@ class PurchaseController extends Controller
 		return view('purchases.create', compact('products', 'warehouses'));
 	}
 
+
     // Store the new purchase
-    public function store(Request $request)
+	public function store(Request $request)
 	{
 		$request->validate([
 			'supplier_name' => 'required',
 			'purchase_date' => 'required|date',
-			'total_amount' => 'required|numeric',
+			'warehouse_id' => 'required|exists:warehouses,id',
+			'products.*.product_id' => 'required|exists:products,id',
+			'products.*.quantity' => 'required|numeric|min:1',
+			'products.*.buying_price' => 'required|numeric|min:0',
 		]);
 
-		$purchase = Purchase::create($request->only('supplier_name', 'purchase_date', 'total_amount'));
-
-		// Attach products to the purchase
+		$totalAmount = 0;
 		foreach ($request->products as $productData) {
-			$purchase->products()->attach($productData['product_id'], ['quantity' => $productData['quantity']]);
+			$totalAmount += $productData['quantity'] * $productData['buying_price'];
+		}
+
+		$purchase = Purchase::create([
+			'supplier_name' => $request->supplier_name,
+			'purchase_date' => $request->purchase_date,
+			'warehouse_id' => $request->warehouse_id,
+			'total_amount' => $totalAmount,
+			'status' => 'Planned',
+		]);
+
+		foreach ($request->products as $productData) {
+			$purchase->products()->attach($productData['product_id'], [
+				'quantity' => $productData['quantity'],
+				'buying_price' => $productData['buying_price'],
+				'total_cost' => $productData['quantity'] * $productData['buying_price']
+			]);
 		}
 
 		return redirect()->route('purchases.index')->with('success', 'Purchase created successfully.');
+	}
+
+
+	public function show($id)
+	{
+		$purchase = Purchase::with(['products', 'warehouse', 'inboundRequests'])->findOrFail($id);
+		return view('purchases.show', compact('purchase'));
 	}
 
 	
@@ -58,41 +84,52 @@ class PurchaseController extends Controller
 
 
 	public function update(Request $request, $id)
-	{	
+	{
 		$request->validate([
 			'supplier_name' => 'required',
 			'purchase_date' => 'required|date',
-			'total_amount' => 'required|numeric',
 			'warehouse_id' => 'required|exists:warehouses,id',
 			'products.*.product_id' => 'required|exists:products,id',
 			'products.*.quantity' => 'required|numeric|min:1',
+			'products.*.buying_price' => 'required|numeric|min:0',
 		]);
 
 		$purchase = Purchase::findOrFail($id);
 		$purchase->update([
 			'supplier_name' => $request->supplier_name,
 			'purchase_date' => $request->purchase_date,
-			'total_amount' => $request->total_amount,
 			'warehouse_id' => $request->warehouse_id,
+			'notes' => $request->notes,
 		]);
 
-		// Sync products and quantities
-		$products = $request->input('products', []);
-		$productQuantities = [];
+		$totalAmount = 0;
 
-		foreach ($products as $product) {
-			// Check if product_id and quantity are present
-			if (isset($product['product_id'], $product['quantity'])) {
-				$productQuantities[$product['product_id']] = ['quantity' => $product['quantity']];
-			}
+		$productQuantities = [];
+		foreach ($request->products as $product) {
+			$quantity = $product['quantity'];
+			$buyingPrice = $product['buying_price'];
+			$totalCost = $quantity * $buyingPrice;
+
+			$productQuantities[$product['product_id']] = [
+				'quantity' => $quantity,
+				'buying_price' => $buyingPrice,
+				'total_cost' => $totalCost,
+			];
+
+			$totalAmount += $totalCost;
 		}
 
-		// Sync products with their quantities
+		// Sync products with updated pivot data
 		$purchase->products()->sync($productQuantities);
+
+		// Update total amount
+		$purchase->total_amount = $totalAmount;
+		$purchase->save();
 
 		return redirect()->route('purchases.index')
 			->with('success', 'Purchase updated successfully.');
 	}
+
 
 	
 	// Delete a specific purchase
@@ -104,6 +141,42 @@ class PurchaseController extends Controller
 		return redirect()->route('purchases.index')
 						 ->with('success', 'Purchase deleted successfully.');
 	}
+	
+	
+	public function updateStatus(Request $request, $id)
+	{
+		$request->validate([
+			'status' => 'required',
+		]);
+
+		$purchase = Purchase::with('products')->findOrFail($id);
+		$oldStatus = $purchase->status;
+		$purchase->status = $request->status;
+		$purchase->save();
+
+		// Only create an inbound request if status changes from Planned to In Transit
+		if ($oldStatus === 'Planned' && $purchase->status === 'In Transit') {
+			// Manually build the requested quantities as an associative array with string keys
+			$requestedQuantities = [];
+			foreach ($purchase->products as $product) {
+				$requestedQuantities[$product->id] = $product->pivot->quantity;
+			}
+			
+			InboundRequest::create([
+				'purchase_order_id' => $purchase->id,
+				'warehouse_id' => $purchase->warehouse_id,
+				'requested_quantities' => $requestedQuantities, // Convert associative array to JSON
+				'received_quantities' => [], // Start with an empty JSON array for received quantities
+				'status' => 'In Transit',
+				'notes' => 'Inbound request created upon status change to In Transit',
+			]);
+		}
+
+		return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully.');
+	}
+
+
+
 	
 	
 	public function transferToWarehouse($purchaseId)
