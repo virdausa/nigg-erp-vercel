@@ -15,6 +15,7 @@ class InboundRequest extends Model
 		'requested_quantities',
         'received_quantities',
         'status',
+		'arrival_date',
         'verified_by',
         'notes',
     ];

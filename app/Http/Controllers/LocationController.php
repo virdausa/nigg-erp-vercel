@@ -16,7 +16,7 @@ class LocationController extends Controller
 
 	public function create()
 	{
-		$warehouses = Warehouse::all();
+		$warehouses = Warehouse::with('locations')->get();
 		$existingRooms = Location::select('room')->distinct()->pluck('room');
 		return view('locations.create', compact('warehouses', 'existingRooms'));
 	}
@@ -60,8 +60,9 @@ class LocationController extends Controller
 	public function edit($id)
 	{
 		$location = Location::findOrFail($id);
-		$warehouses = Warehouse::all();
-		$existingRooms = Location::select('room')->distinct()->pluck('room');
+		$warehouses = Warehouse::with('locations')->get();
+		// Get unique rooms for the selected warehouse
+		$existingRooms = Location::where('warehouse_id', $location->warehouse_id)->select('room')->distinct()->pluck('room');
 		return view('locations.edit', compact('location', 'warehouses', 'existingRooms'));
 	}
 

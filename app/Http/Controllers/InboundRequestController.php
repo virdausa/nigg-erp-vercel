@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\InboundRequest;
 use App\Models\Purchase;
 use App\Models\User;
+use App\Models\Location;
+use App\Models\InventoryHistory;
 use Illuminate\Http\Request;
 
 class InboundRequestController extends Controller
@@ -54,7 +56,6 @@ class InboundRequestController extends Controller
 	}
 
 
-
 	// Edit method to show the edit view
     public function edit($id)
     {
@@ -69,20 +70,60 @@ class InboundRequestController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required',
-            'verified_by' => 'nullable|exists:users,id',
-            'notes' => 'nullable|string',
-            'received_quantities' => 'array',
-            'received_quantities.*' => 'integer|min:0',
-        ]);
+			'status' => 'required',
+			'verified_by' => 'nullable|exists:users,id',
+			'notes' => 'nullable|string',
+			'received_quantities' => 'array',
+			'received_quantities.*' => 'integer|min:0',
+			'arrival_date' => 'nullable|date',  // Add this line
+		]);
+
 
         $inboundRequest = InboundRequest::findOrFail($id);
+		
+		// Handle checking quantities action
+		if ($request->action === 'check_quantities') {
+			$hasDiscrepancy = false;
+			$receivedQuantities = $request->input('received_quantities', []);
+
+			// Check for discrepancies
+			foreach ($receivedQuantities as $productId => $receivedQuantity) {
+				$requestedQuantity = $inboundRequest->requested_quantities[$productId] ?? 0;
+				if ($requestedQuantity != $receivedQuantity) {
+					$hasDiscrepancy = true;
+					break;
+				}
+			}
+
+			// Set status based on discrepancy
+			if ($hasDiscrepancy) {
+				$inboundRequest->status = 'Quantity Discrepancy';
+				$inboundRequest->notes = 'Quantity discrepancy detected. Awaiting purchase team decision.';
+			} else {
+				$inboundRequest->status = 'Ready to Complete';
+				$inboundRequest->notes = 'Quantities match; ready for completion.';
+			}
+
+			$inboundRequest->received_quantities = $receivedQuantities;
+			$inboundRequest->save();
+
+			return redirect()->route('inbound_requests.show', $inboundRequest->id)
+				->with('success', 'Quantities checked successfully.');
+		}
+		
         $inboundRequest->update([
-            'status' => $request->status,
-            'verified_by' => $request->verified_by,
-            'notes' => $request->notes,
-            'received_quantities' => $request->input('received_quantities', []),
-        ]);
+			'status' => $request->status,
+			'verified_by' => $request->verified_by,
+			'notes' => $request->notes,
+			'received_quantities' => $request->input('received_quantities', []),
+			'arrival_date' => $request->arrival_date,
+		]);
+
+		// Check if arrival_date is set and status is In Transit, then update status to Received - Pending Verification
+		if ($request->arrival_date && $inboundRequest->status == 'In Transit') {
+			$inboundRequest->status = 'Received - Pending Verification';
+			$inboundRequest->save();
+		}
 
 		// Check overall status of all inbound requests for this purchase
 		$this->updatePurchaseStatus($inboundRequest->purchase_order_id);
@@ -99,16 +140,12 @@ class InboundRequestController extends Controller
 
 		switch ($action) {
 			case 'accept_partial':
-				// Logic for accepting partial shipment
-				$inboundRequest->status = 'Completed';
-				$inboundRequest->save();
+				// Accept received quantity as-is, mark discrepancy as resolved
+				$inboundRequest->status = 'Ready to Complete';
+				$inboundRequest->notes = 'Discrepancy resolved by accepting partial shipment.';
 				break;
 
 			case 'request_additional':
-				// Logic for requesting additional shipment
-				$inboundRequest->status = 'Completed';
-				$inboundRequest->save();
-
 				// Create a new inbound request for the remaining quantities
 				InboundRequest::create([
 					'purchase_order_id' => $inboundRequest->purchase_order_id,
@@ -120,14 +157,13 @@ class InboundRequestController extends Controller
 				]);
 
 				// Update purchase status to indicate pending additional shipment
-				$purchase = $inboundRequest->purchase;
-				$purchase->status = 'Pending Additional Shipment';
-				$purchase->save();
+				$inboundRequest->status = 'Ready to Complete';
+				$inboundRequest->notes = 'Additional inbound request created for missing items. Dicrepancy resolved';
 				break;
 
 			case 'record_excess':
 				// Logic for recording excess as extra stock
-				$inboundRequest->status = 'Completed';
+				$inboundRequest->status = 'Ready to Complete';
 				$inboundRequest->save();
 				// Additional logic to add the excess to inventory could go here
 				break;
@@ -135,6 +171,8 @@ class InboundRequestController extends Controller
 			default:
 				return redirect()->back()->with('error', 'Invalid action');
 		}
+
+		$inboundRequest->save();
 
 		// Check overall status of all inbound requests for this purchase
 		$this->updatePurchaseStatus($inboundRequest->purchase_order_id);
@@ -174,6 +212,9 @@ class InboundRequestController extends Controller
 		} elseif ($inboundRequests->contains('status', 'In Transit') && $inboundRequests->contains('status', 'Completed')) {
 			// There’s at least one completed request, but some are still in transit
 			$purchase->status = 'Pending Additional Shipment';
+		} elseif ($inboundRequests->every(fn($ir) => $ir->arrival_date)) {
+			// All inbound received are completed
+			$purchase->status = 'Received - Pending Verification';
 		} else {
 			// Default to "In Transit" if none of the above conditions are met
 			$purchase->status = 'In Transit';
@@ -220,6 +261,9 @@ class InboundRequestController extends Controller
 		$inboundRequest->status = 'Completed';
 		$inboundRequest->save();
 
+		// Check overall status of all inbound requests for this purchase
+		$this->updatePurchaseStatus($inboundRequest->purchase_order_id);
+	
 		return redirect()->route('inbound_requests.show', $id)->with('success', 'Inbound request completed.');
 	}
 

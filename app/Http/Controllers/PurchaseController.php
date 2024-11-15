@@ -14,7 +14,8 @@ class PurchaseController extends Controller
     // Method to show all purchases
     public function index()
     {
-        $purchases = Purchase::all(); // Retrieve all purchase records
+        //$purchases = Purchase::all(); // Retrieve all purchase records
+		$purchases = Purchase::with('inboundRequests')->orderBy('id', 'desc')->get();
         return view('purchases.index', compact('purchases')); // Pass data to the view
     }
 
@@ -92,6 +93,9 @@ class PurchaseController extends Controller
 			'products.*.product_id' => 'required|exists:products,id',
 			'products.*.quantity' => 'required|numeric|min:1',
 			'products.*.buying_price' => 'required|numeric|min:0',
+			'shipped_date' => 'nullable|date', // new field for shipped date
+			'expedition' => 'nullable|string', // new field for expedition
+			'tracking_no' => 'nullable|string', // new field for tracking number
 		]);
 
 		$purchase = Purchase::findOrFail($id);
@@ -100,8 +104,32 @@ class PurchaseController extends Controller
 			'purchase_date' => $request->purchase_date,
 			'warehouse_id' => $request->warehouse_id,
 			'notes' => $request->notes,
+			'shipped_date' => $request->shipped_date,
+			'expedition' => $request->expedition,
+			'tracking_no' => $request->tracking_no,
 		]);
 
+		// Automatically set status to "In Transit" if shipment details are filled
+		if ($purchase->status == 'Planned' && $request->shipped_date && $request->expedition && $request->tracking_no) {
+			$purchase->status = 'In Transit';
+			$purchase->save();
+
+			// Create an inbound request when moving to "In Transit"
+			$requestedQuantities = [];
+			foreach ($purchase->products as $product) {
+				$requestedQuantities[$product->id] = $product->pivot->quantity;
+			}
+
+			InboundRequest::create([
+				'purchase_order_id' => $purchase->id,
+				'warehouse_id' => $purchase->warehouse_id,
+				'requested_quantities' => $requestedQuantities,
+				'received_quantities' => [],
+				'status' => 'In Transit',
+				'notes' => 'Inbound request created upon status change to In Transit',
+			]);
+		}
+		
 		$totalAmount = 0;
 
 		$productQuantities = [];
@@ -141,111 +169,5 @@ class PurchaseController extends Controller
 		return redirect()->route('purchases.index')
 						 ->with('success', 'Purchase deleted successfully.');
 	}
-	
-	
-	public function updateStatus(Request $request, $id)
-	{
-		$request->validate([
-			'status' => 'required',
-		]);
-
-		$purchase = Purchase::with('products')->findOrFail($id);
-		$oldStatus = $purchase->status;
-		$purchase->status = $request->status;
-		$purchase->save();
-
-		// Only create an inbound request if status changes from Planned to In Transit
-		if ($oldStatus === 'Planned' && $purchase->status === 'In Transit') {
-			// Manually build the requested quantities as an associative array with string keys
-			$requestedQuantities = [];
-			foreach ($purchase->products as $product) {
-				$requestedQuantities[$product->id] = $product->pivot->quantity;
-			}
-			
-			InboundRequest::create([
-				'purchase_order_id' => $purchase->id,
-				'warehouse_id' => $purchase->warehouse_id,
-				'requested_quantities' => $requestedQuantities, // Convert associative array to JSON
-				'received_quantities' => [], // Start with an empty JSON array for received quantities
-				'status' => 'In Transit',
-				'notes' => 'Inbound request created upon status change to In Transit',
-			]);
-		}
-
-		return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully.');
-	}
-
-
-
-	
-	
-	public function transferToWarehouse($purchaseId)
-	{
-		$purchase = Purchase::find($purchaseId);
-		$warehouse = Warehouse::find($purchase->warehouse_id); // Get the assigned warehouse
-
-		if ($warehouse && $purchase) {
-			// Transfer logic (moving quantities to the warehouse)
-			foreach ($purchase->products as $product) {
-				$warehouse->products()->attach($product->id, ['quantity' => $product->pivot->quantity]);
-			
-				// Log the transfer in inventory history
-				InventoryHistory::create([
-					'product_id' => $product->id,
-					'warehouse_id' => $warehouse->id,
-					'quantity' => $product->pivot->quantity,
-					'transaction_type' => 'Purchase',
-					'notes' => 'Transferred from purchase order ' . $purchase->id,
-				]);
-			}
-
-			// Mark purchase as transferred
-			$purchase->is_transferred = true;
-			$purchase->save();
-
-			return redirect()->route('purchases.index')->with('success', 'Products transferred to warehouse successfully.');
-		} else {
-			return redirect()->route('purchases.index')->with('error', 'Warehouse not assigned or Purchase not found.');
-		}
-	}
-
-
-	
-	public function storeTransfer(Request $request, $id)
-	{
-		$request->validate([
-			'warehouse_id' => 'required|exists:warehouses,id',
-			'products' => 'required|array',
-			'products.*' => 'required|integer|min:0',
-		]);
-
-		$purchase = Purchase::findOrFail($id);
-		$warehouseId = $request->warehouse_id;
-
-		foreach ($request->products as $productId => $quantity) {
-			if ($quantity > 0) {
-				$purchaseProduct = $purchase->products()->find($productId);
-				if ($purchaseProduct && $purchaseProduct->pivot->quantity >= $quantity) {
-					// Reduce quantity from purchase
-					$purchaseProduct->pivot->quantity -= $quantity;
-					$purchaseProduct->pivot->save();
-
-					// Add quantity to warehouse inventory
-					$productInWarehouse = $purchaseProduct->warehouses()->where('warehouse_id', $warehouseId)->first();
-					if ($productInWarehouse) {
-						// Update quantity if product already exists in the warehouse
-						$productInWarehouse->pivot->quantity += $quantity;
-						$productInWarehouse->pivot->save();
-					} else {
-						// Create new entry if product doesn't exist in the warehouse
-						$purchaseProduct->warehouses()->attach($warehouseId, ['quantity' => $quantity]);
-					}
-				}
-			}
-		}
-
-		return redirect()->route('inventory.index')->with('success', 'Products transferred to warehouse successfully.');
-	}
-
 
 }

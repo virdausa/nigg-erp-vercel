@@ -15,6 +15,9 @@ class Purchase extends Model
 		'purchase_date',
 		'warehouse_id',
 		'status', // new field for status tracking
+		'shipped_date',
+		'expedition',
+		'tracking_no',
 		'total_amount'
 	];
 	

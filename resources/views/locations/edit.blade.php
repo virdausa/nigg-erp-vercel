@@ -7,21 +7,18 @@
         @csrf
         @method('PUT')
         <div class="form-group">
-            <label for="warehouse_id">Warehouse</label>
-            <select name="warehouse_id" class="form-control" required>
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" {{ $location->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
-                @endforeach
-            </select>
-        </div>
+			<label for="warehouse">Warehouse</label>
+			<input type="text" class="form-control" value="{{ $location->warehouse->name }}" readonly>
+			<input type="hidden" name="warehouse_id" value="{{ $location->warehouse_id }}">
+		</div>
 		<!-- Room Selection and Input -->
 		<div class="form-group">
 			<label for="room">Room</label>
 			<select name="existing_room" class="form-control" id="existing-room-select">
 				<option value="">-- Select Existing Room --</option>
-				@foreach ($warehouse->locations->unique('room') as $location)
-					<option value="{{ $location->room }}">
-						{{ $location->room }}
+				@foreach ($existingRooms as $room)
+					<option value="{{ $room }}" {{ $location->room == $room ? 'selected' : '' }}>
+						{{ $room }}
 					</option>
 				@endforeach
 			</select>
@@ -29,6 +26,7 @@
 			<label for="new_room" class="mt-2">Or enter a new room</label>
 			<input type="text" name="new_room" id="new-room-input" class="form-control" placeholder="Enter new room name">
 		</div>
+
         <div class="form-group">
             <label for="rack">Rack</label>
             <input type="text" name="rack" class="form-control" value="{{ $location->rack }}" required>

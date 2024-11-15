@@ -16,15 +16,17 @@
             <label for="warehouse_id">Warehouse</label>
             <input type="text" class="form-control" name="warehouse_id" value="{{ $inboundRequest->warehouse->name }}" readonly>
         </div>
+	
+		<div class="form-group">
+			<label for="arrival_date">Arrival Date</label>
+			<input type="date" class="form-control" name="arrival_date" 
+				   value="{{ $inboundRequest->arrival_date ? $inboundRequest->arrival_date : '' }}"
+				   {{ $inboundRequest->status == 'In Transit' ? '' : 'disabled' }}>
+		</div>
 
         <div class="form-group">
             <label for="status">Inbound Request Status</label>
-            <select name="status" class="form-control" required>
-                <option value="In Transit" {{ $inboundRequest->status == 'In Transit' ? 'selected' : '' }}>In Transit</option>
-                <option value="Received - Pending Verification" {{ $inboundRequest->status == 'Received - Pending Verification' ? 'selected' : '' }}>Received - Pending Verification</option>
-                <option value="Quantity Discrepancy" {{ $inboundRequest->status == 'Quantity Discrepancy' ? 'selected' : '' }}>Quantity Discrepancy</option>
-                <option value="Completed" {{ $inboundRequest->status == 'Completed' ? 'selected' : '' }}>Completed</option>
-            </select>
+			<input type="text" class="form-control" name="status" value="{{ $inboundRequest->status }}" readonly>
         </div>
 
         <h3>Products</h3>
@@ -42,12 +44,16 @@
 					<!-- Editable Received Quantity -->
 					<div>
 						<label>Received Quantity</label>
-						<input type="number" name="received_quantities[{{ $product->id }}]" class="form-control" min="0" value="{{ $inboundRequest->received_quantities[$product->id] ?? 0 }}">
+						<input type="number" name="received_quantities[{{ $product->id }}]" class="form-control" min="0" value="{{ $inboundRequest->received_quantities[$product->id] ?? 0 }}" {{ $inboundRequest->status == 'Received - Pending Verification' ? '' : 'readonly' }}>
 					</div>
 				</div>
 			@endif
 		@endforeach
 
+		<!-- New Check Quantities Button -->
+		@if($inboundRequest->status == 'Received - Pending Verification')
+			<button type="submit" class="btn btn-warning" name="action" value="check_quantities">Check Quantities</button>
+		@endif
 
         <div class="form-group">
             <label for="verified_by">Verified By</label>

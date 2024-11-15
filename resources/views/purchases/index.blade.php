@@ -40,13 +40,17 @@
 					</td>
 
 					<td>
-						<a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-info">View Details</a>
-						<a href="{{ route('purchases.edit', $purchase->id) }}" class="btn btn-warning">Edit</a>
+						<a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-info">Show</a>
+						@if ($purchase->status != 'Completed')
+							<a href="{{ route('purchases.edit', $purchase->id) }}" class="btn btn-warning">Edit</a>
+						@endif
+						@if ($purchase->status == 'Planned')
 						<form action="{{ route('purchases.destroy', $purchase->id) }}" method="POST" style="display:inline;">
 							@csrf
 							@method('DELETE')
 							<button type="submit" class="btn btn-danger">Delete</button>
 						</form>
+						@endif
 					</td>
 				</tr>
 			@endforeach

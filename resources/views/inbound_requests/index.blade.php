@@ -22,7 +22,7 @@
                     <td>{{ $request->status }}</td>
                     <td>
                         @foreach($request->received_quantities as $productId => $qty)
-                            {{ $productId }}: {{ $qty }}<br>
+                            {{ $productId }}: {{ $request->requested_quantities[$productId] }} / {{ $qty }}<br>
                         @endforeach
                     </td>
                     <td>{{ optional($request->verifier)->name }}</td>
@@ -30,7 +30,7 @@
 					<td>
 						<a href="{{ route('inbound_requests.show', $request->id) }}" class="btn btn-info">Show</a>
 						@if ($request->status !== 'Completed')
-							<a href="{{ route('inbound_requests.edit', $request->id) }}" class="btn btn-primary">Update Status</a>
+							<a href="{{ route('inbound_requests.edit', $request->id) }}" class="btn btn-primary">Update</a>
 						@endif
 					</td>
                 </tr>

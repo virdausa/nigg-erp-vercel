@@ -43,6 +43,7 @@
 		<button type="button" id="add-product" class="btn btn-secondary">Add Another Product</button>
 		
         <button type="submit" class="btn btn-primary">Save Purchase</button>
+		<a href="{{ route('purchases.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
 	
 	<script>
