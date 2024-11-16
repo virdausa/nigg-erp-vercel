@@ -10,13 +10,16 @@ use App\Models\Location;
 use App\Models\InboundRequest;
 use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class InventoryController extends Controller
 {
-    public function index(Request $request)
+	public function index(Request $request)
 	{
-		$query = Inventory::with(['product', 'warehouse', 'location']);
+		$query = Inventory::with(['product', 'warehouse']);
 
+		// Apply search filter
 		if ($request->has('search')) {
 			$search = $request->input('search');
 			$query->whereHas('product', function ($q) use ($search) {
@@ -27,9 +30,14 @@ class InventoryController extends Controller
 		}
 
 		$inventories = $query->get();
-		$stockDetails = $this->getStockDetails();
 
-		return view('inventory.index', compact('inventories', 'stockDetails'));
+		// Fetch inventory details grouped by location
+		$inventoryByLocations = InventoryHistory::with(['product', 'warehouse', 'location'])
+			->select('product_id', 'warehouse_id', 'location_id', DB::raw('SUM(quantity) as total_quantity'))
+			->groupBy('product_id', 'warehouse_id', 'location_id')
+			->get();
+
+		return view('inventory.index', compact('inventories', 'inventoryByLocations'));
 	}
 
 
