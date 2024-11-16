@@ -5,6 +5,7 @@
 @section('content')
     <h1>Warehouse List</h1>
     <a href="{{ route('warehouses.create') }}" class="btn btn-primary mb-3">Add New Warehouse</a>
+	<a href="{{ route('locations.index') }}" class="btn btn-secondary mb-3">Manage Location</a>
     <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>

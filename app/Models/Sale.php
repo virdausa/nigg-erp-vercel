@@ -22,4 +22,12 @@ class Sale extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
+	
+	public function productQuantities()
+	{
+		return $this->products->mapWithKeys(function ($product) {
+			return [$product->id => $product->pivot->quantity];
+		});
+	}
+
 }

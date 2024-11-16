@@ -26,14 +26,8 @@
 						<li class="nav-item">
 							<a class="nav-link" href="{{ route('warehouses.index') }}">Warehouses</a>
 						</li>
-						<li>	
-							<a class="nav-link" href="{{ route('locations.index') }}">Location</a>
-						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="{{ route('inventory.index') }}">Inventory</a>
-						</li>
-						<li>
-							<a class="nav-link" href="{{ route('inventory.history') }}">Inventory History</a>
 						</li>
 						<li>
 							<a class="nav-link" href="{{ route('sales.index') }}">Sales</a>

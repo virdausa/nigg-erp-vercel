@@ -6,6 +6,7 @@ use App\Models\InboundRequest;
 use App\Models\Purchase;
 use App\Models\User;
 use App\Models\Location;
+use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use Illuminate\Http\Request;
 
@@ -255,6 +256,21 @@ class InboundRequestController extends Controller
 				'transaction_type' => 'Inbound',
 				'notes' => 'Transferred from inbound request ' . $inboundRequest->id,
 			]);
+			
+			
+			// Check if the product already exists in the inventory for the specified warehouse
+			$inventory = Inventory::firstOrCreate(
+				[
+					'product_id' => $productId,
+					'warehouse_id' => $inboundRequest->warehouse_id
+				],
+				['quantity' => 0]
+			);
+
+			// Update the inventory quantity
+			$receivedQuantity = $inboundRequest->received_quantities[$productId] ?? 0;
+			$inventory->quantity += $receivedQuantity;
+			$inventory->save();
 		}
 
 		// Mark the inbound request as completed

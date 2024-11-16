@@ -17,4 +17,8 @@ class Location extends Model
 		return $this->belongsTo(Warehouse::class);
 	}
 
+	public function inventory()
+    {
+        return $this->hasMany(Inventory::class);
+    }
 }

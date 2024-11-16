@@ -4,24 +4,146 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Models\Inventory;
 use App\Models\InventoryHistory;
+use App\Models\Location;
+use App\Models\InboundRequest;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
 	{
-		$warehouses = Warehouse::with(['products' => function($query) {
-			$query->select('products.id', 'products.name', 'product_warehouse.quantity');
-		}])->get();
+		$query = Inventory::with(['product', 'warehouse', 'location']);
 
-		return view('inventory.index', compact('warehouses'));
+		if ($request->has('search')) {
+			$search = $request->input('search');
+			$query->whereHas('product', function ($q) use ($search) {
+				$q->where('name', 'LIKE', "%{$search}%");
+			})->orWhereHas('warehouse', function ($q) use ($search) {
+				$q->where('name', 'LIKE', "%{$search}%");
+			});
+		}
+
+		$inventories = $query->get();
+		$stockDetails = $this->getStockDetails();
+
+		return view('inventory.index', compact('inventories', 'stockDetails'));
 	}
+
+
 
 	public function history()
 	{
 		$history = InventoryHistory::with('product', 'warehouse')->orderBy('created_at', 'desc')->get();
 		return view('inventory.history', compact('history'));
+	}
+
+	public function showAdjustmentForm()
+	{
+		$products = Product::all();
+		$warehouses = Warehouse::all();
+		$locations = Location::all(); // To populate room and rack options
+
+		return view('inventory.adjust', compact('products', 'warehouses', 'locations'));
+	}
+
+	public function adjustInventory(Request $request)
+	{
+		$request->validate([
+			'product_id' => 'required|exists:products,id',
+			'warehouse_id' => 'required|exists:warehouses,id',
+			'quantity' => 'required|integer',
+			'transaction_type' => 'required|in:Addition,Reduction',
+			'room' => 'required|string', // Validate room
+			'rack' => 'required|string', // Validate rack
+			'notes' => 'nullable|string'
+		]);
+
+		$productId = $request->input('product_id');
+		$warehouseId = $request->input('warehouse_id');
+		$quantity = $request->input('quantity');
+		$transactionType = $request->input('transaction_type');
+
+		// Fetch or create the inventory entry for the product in the warehouse
+		$inventory = Inventory::firstOrCreate(
+			[
+				'product_id' => $productId,
+				'warehouse_id' => $warehouseId
+			],
+			['quantity' => 0]
+		);
+
+		// Adjust inventory quantity based on transaction type
+		if ($transactionType === 'Addition') {
+			$inventory->quantity += $quantity;
+		} elseif ($transactionType === 'Reduction') {
+			$inventory->quantity -= $quantity;
+			if ($inventory->quantity < 0) {
+				$inventory->quantity = 0; // Ensure quantity doesn't go negative
+			}
+		}
+
+		$inventory->save();
+
+		$location = Location::where('warehouse_id', $warehouseId)
+								->where('room', $request->room)
+								->where('rack', $request->rack)
+								->first();
+		
+		// Record transaction in inventory history
+		InventoryHistory::create([
+			'product_id' => $productId,
+			'warehouse_id' => $warehouseId,
+			'quantity' => $quantity,
+			'transaction_type' => $transactionType,
+			'location_id' => $location->id,
+			'notes' => $request->input('notes'),
+		]);
+
+		return redirect()->route('inventory.index')->with('success', 'Inventory adjusted successfully.');
+	}
+	
+	public function getLocationsByWarehouse($warehouseId)
+	{
+		// Fetch all locations in the specified warehouse, grouped by room and rack
+		$locations = Location::where('warehouse_id', $warehouseId)
+							 ->select('id', 'room', 'rack')
+							 ->get();
+
+		return response()->json($locations);
+	}
+	
+	private function getStockDetails()
+	{
+		$inventories = Inventory::with(['product', 'warehouse', 'location'])->get();
+		$inboundRequests = InboundRequest::where('status', 'In Transit')->get();
+		//$salesOrders = Sale::where('status', 'Pending')->get();
+
+		$availableStock = [];
+		$incomingStock = [];
+		$outgoingStock = [];
+
+		foreach ($inventories as $inventory) {
+			$availableStock[$inventory->product_id] = ($availableStock[$inventory->product_id] ?? 0) + $inventory->quantity;
+		}
+
+		foreach ($inboundRequests as $request) {
+			foreach ($request->productQuantities() as $productId => $quantity) {
+				$incomingStock[$productId] = ($incomingStock[$productId] ?? 0) + $quantity;
+			}
+		}
+		
+		/*
+		foreach ($salesOrders as $order) {
+			foreach ($order->productQuantities() as $productId => $quantity) {
+				$outgoingStock[$productId] = ($outgoingStock[$productId] ?? 0) + $quantity;
+			}
+		}
+		*/
+
+		return compact('availableStock', 'incomingStock', 'outgoingStock');
 	}
 
 }

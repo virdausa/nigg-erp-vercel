@@ -40,4 +40,16 @@ class InboundRequest extends Model
     {
         return $this->belongsTo(User::class, 'verified_by');
     }
+	
+	public function productQuantities()
+	{
+		$requestedQuantities = collect($this->requested_quantities); // Cast to Collection
+		$receivedQuantities = collect($this->received_quantities); // Cast to Collection
+
+		return $requestedQuantities->mapWithKeys(function ($quantity, $productId) use ($receivedQuantities) {
+			return [$productId => $quantity - ($receivedQuantities->get($productId, 0))];
+		});
+	}
+
+
 }
