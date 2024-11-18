@@ -37,8 +37,6 @@ Route::resource('locations', LocationController::class);
 
 // Inbound Requests
 Route::resource('inbound_requests', InboundRequestController::class);
-Route::post('inbound-requests/{id}/approve', [InboundRequestController::class, 'approve'])->name('inbound-requests.approve');
-Route::post('inbound-requests/{id}/receive', [InboundRequestController::class, 'receive'])->name('inbound-requests.receive');
 Route::post('/inbound_requests/{id}/handle-discrepancy', [InboundRequestController::class, 'handleDiscrepancyAction'])->name('inbound_requests.handleDiscrepancyAction');
 Route::get('/inbound_requests/{id}/complete', [InboundRequestController::class, 'complete'])->name('inbound_requests.complete');
 Route::post('/inbound_requests/{id}/complete', [InboundRequestController::class, 'storeCompletion'])->name('inbound_requests.storeCompletion');
@@ -46,8 +44,8 @@ Route::post('/inbound_requests/{id}/complete', [InboundRequestController::class,
 
 // Outbound Requests
 Route::resource('outbound_requests', OutboundRequestController::class);
-Route::post('outbound_requests/{id}/approve', [OutboundRequestController::class, 'approve'])->name('outbound-requests.approve');
-Route::post('outbound_requests/{id}/execute', [OutboundRequestController::class, 'execute'])->name('outbound-requests.execute');
+Route::get('/outbound_requests/{outboundRequest}/check-stock', [OutboundRequestController::class, 'checkStockAvailability'])->name('outbound_requests.checkStock');
+Route::get('/outbound_requests/{outboundRequest}/reject', [OutboundRequestController::class, 'rejectRequest'])->name('outbound_requests.reject');
 
 
 Route::resource('suppliers', SupplierController::class);

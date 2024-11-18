@@ -7,47 +7,63 @@
         @csrf
         @method('PUT')
 
-        <h3>Products</h3>
-        @foreach ($outboundRequest->sales->products as $product)
-            <div class="form-group">
-                <label>{{ $product->name }}</label>
-                <input type="number" name="received_quantities[{{ $product->id }}]" class="form-control" 
-                       placeholder="Quantity to Ship" value="{{ old('received_quantities.' . $product->id) }}">
-            </div>
-        @endforeach
-
-        <h3>Shipping Details</h3>
+        <!-- Warehouse and Requested Products -->
         <div class="form-group">
-            <label for="packing_fee">Packing Fee</label>
-            <input type="number" name="packing_fee" class="form-control" value="{{ $outboundRequest->packing_fee }}">
+            <label for="warehouse_id">Warehouse</label>
+            <input type="text" class="form-control" value="{{ $outboundRequest->warehouse->name }}" disabled>
         </div>
-        <div class="form-group">
-            <label for="shipping_fee">Shipping Fee</label>
-            <input type="number" name="shipping_fee" class="form-control" value="{{ $outboundRequest->shipping_fee }}">
-        </div>
-        <div class="form-group">
-            <label for="real_volume">Real Volume</label>
-            <input type="number" name="real_volume" class="form-control" value="{{ $outboundRequest->real_volume }}">
-        </div>
-        <div class="form-group">
-            <label for="real_weight">Real Weight</label>
-            <input type="number" name="real_weight" class="form-control" value="{{ $outboundRequest->real_weight }}">
-        </div>
-        <div class="form-group">
-            <label for="tracking_number">Tracking Number</label>
-            <input type="text" name="tracking_number" class="form-control" value="{{ $outboundRequest->tracking_number }}">
+		
+		<div class="form-group">
+            <label for="status">Outbound Status</label>
+            <input type="text" class="form-control" name="status" value="{{ $outboundRequest->status }}" readonly>
         </div>
 
-        <h3>Status</h3>
-        <div class="form-group">
-            <select name="status" class="form-control">
-                <option value="Pending Confirmation" {{ $outboundRequest->status == 'Pending Confirmation' ? 'selected' : '' }}>Pending Confirmation</option>
-                <option value="Packing & Shipping" {{ $outboundRequest->status == 'Packing & Shipping' ? 'selected' : '' }}>Packing & Shipping</option>
-                <option value="In Transit" {{ $outboundRequest->status == 'In Transit' ? 'selected' : '' }}>In Transit</option>
-                <option value="Completed" {{ $outboundRequest->status == 'Completed' ? 'selected' : '' }}>Completed</option>
-            </select>
+        <h3>Requested Products</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Requested Quantity</th>
+					<th>Stock in Warehouse</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($outboundRequest->requested_quantities as $productId => $quantity)
+                    <tr>
+                        <td>{{ $outboundRequest->sales->products->find($productId)->name }}</td>
+                        <td>{{ $quantity }}</td>
+						<td></td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+		<div class="form-group">
+            <label for="admin_notes">Sales Notes</label>
+            <textarea name="admin_notes" class="form-control">{{ $outboundRequest->sales->admin_notes }}</textarea>
+        </div>
+	
+		<div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea name="notes" class="form-control" placeholder="Optional notes">{{ $outboundRequest->notes }}</textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Update Request</button>
+        <!-- Action Buttons -->
+        <h3>Actions</h3>
+        @if ($outboundRequest->status == 'Requested')
+            <a href="{{ route('outbound_requests.checkStock', $outboundRequest->id) }}" class="btn btn-primary">
+                Verify Stock & Approve
+            </a>
+            <a href="{{ route('outbound_requests.reject', $outboundRequest->id) }}" class="btn btn-danger">
+                Reject Request
+            </a>
+        @endif
+        @if ($outboundRequest->status == 'Packing & Shipping')
+            <button type="submit" class="btn btn-success">Mark as Shipped</button>
+        @endif
+
+		<br><br>
+		<button type="submit" class="btn btn-primary">Update Outbound Request</button>
+        <a href="{{ route('outbound_requests.index') }}" class="btn btn-secondary">Back to List</a>
     </form>
 @endsection

@@ -87,7 +87,8 @@ class SalesController extends Controller
 		$warehouses = Warehouse::all();
 		$products = Product::all();
 		$expeditions = Expedition::all(); // Fetch expeditions
-		return view('sales.edit', compact('sale', 'warehouses', 'products', 'expeditions'));
+		$outboundRequests = OutboundRequest::all(); // Fetch OutboundRequest
+		return view('sales.edit', compact('sale', 'warehouses', 'products', 'expeditions', 'outboundRequests'));
 	}
 
 
@@ -146,8 +147,6 @@ class SalesController extends Controller
 
 	public function updateStatus(Sale $sale, $status)
 	{
-		// Perform validation or checks if necessary (e.g., stock availability)
-		
 		// Set status to "Unpaid" and request outbound
 		if ($sale->status == 'Planned' && $status == 'Unpaid') {
 			$sale->status = $status;
@@ -164,9 +163,29 @@ class SalesController extends Controller
 				'warehouse_id' => $sale->warehouse_id,
 				'requested_quantities' => $requestedQuantities,
 				'received_quantities' => [],
-				'status' => 'Pending',
+				'status' => 'Requested',
 				'notes' => 'Outbound request created upon status change to Unpaid',
 			]);
+		}
+		
+		// Set status to "Pending Shipment" after confirming payment
+		if ($status == 'Pending Shipment') {
+			// Check if the sale is in the correct status
+			if ($sale->status !== 'Unpaid') {
+				return redirect()->back()->with('error', 'This sale cannot be marked as paid.');
+			}
+			
+			// Update the related Outbound Request status
+			$outboundRequest = OutboundRequest::where('sales_order_id', $sale->id)
+												->where('status', 'Pending Confirmation')->last();
+			if ($outboundRequest) {
+				$outboundRequest->status = 'Packing & Shipping';
+				$outboundRequest->save();
+			}
+			
+			$sale->update(['status' => $status]);
+		    return redirect()->route('sales.show', $sale->id)
+							->with('success', 'Sale marked as paid and is now pending shipment.');
 		}
 		
 		$sale->update(['status' => $status]);

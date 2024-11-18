@@ -6,6 +6,7 @@ use App\Models\OutboundRequest;
 use App\Models\Warehouse;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use App\Models\Expedition;
 use Illuminate\Http\Request;
@@ -70,6 +71,47 @@ class OutboundRequestController extends Controller
 
 		return redirect()->route('outbound_requests.index')->with('success', 'Outbound Request updated successfully!');
 	}
+
+	
+	public function checkStockAvailability(OutboundRequest $outboundRequest)
+	{
+		$warehouse = $outboundRequest->warehouse;
+		$requestedQuantities = collect($outboundRequest->requested_quantities);
+
+		foreach ($requestedQuantities as $productId => $quantity) {
+			$availableStock = Inventory::where('warehouse_id', $warehouse->id)
+										->where('product_id', $productId)
+										->sum('quantity');
+
+			if ($quantity > $availableStock) {
+				return redirect()->back()->withErrors([
+					'error' => "Insufficient stock for product ID: $productId in warehouse {$warehouse->name}."
+				]);
+			}
+		}
+
+		// If stock is sufficient, proceed to the next status
+		$outboundRequest->update(['status' => 'Pending Confirmation']);
+		return redirect()->route('outbound_requests.edit', $outboundRequest->id)
+						 ->with('success', 'Stock verified and status updated to Pending Confirmation.');
+	}
+
+
+	public function rejectRequest(OutboundRequest $outboundRequest)
+	{
+		$sales = $outboundRequest->sales;
+		
+		// go back status
+		$sales->status = 'Planned';
+		$sales->save();
+		
+		// destroy outbound
+		$outboundRequest->delete();
+		
+		return redirect()->route('outbound_requests.index')
+						 ->with('success', 'Outbound Request has been rejected & deleted successfully.');
+	}
+	
 
     public function approve($id)
     {

@@ -84,21 +84,23 @@
             <textarea name="complaint_details" class="form-control">{{ $sale->complaint_details }}</textarea>
         </div>
 
-        <!-- Action Buttons -->
 		<!-- Status Display -->
         <div class="form-group">
             <label for="status">Sales Status</label>
             <input type="text" class="form-control" name="status" value="{{ $sale->status }}" readonly>
         </div>
+		<div class="form-group">
+            <label for="status_outbound">Outbound Status</label>
+            <input type="text" class="form-control" value="{{ $outboundRequests[count($outboundRequests)-1]->status }}" readonly>
+        </div>
 		
+        <!-- Action Buttons -->
         <h3>Actions</h3>
         <div class="mt-3">
             @if($sale->status == 'Planned')
                 <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Unpaid']) }}" class="btn btn-primary mb-3">Request Outbound</a>
             @elseif($sale->status == 'Unpaid')
                 <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Pending Shipment']) }}" class="btn btn-success mb-3">Mark as Paid</a>
-            @elseif($sale->status == 'Pending Shipment')
-                <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'In Transit']) }}" class="btn btn-warning mb-3">Ship Order</a>
             @elseif($sale->status == 'In Transit')
                 <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Received - Pending Verification']) }}" class="btn btn-info mb-3">Mark as Received</a>
             @elseif($sale->status == 'Customer Complaint')

@@ -58,4 +58,10 @@ class Sale extends Model
 	{
 		return $this->belongsTo(Expedition::class);
 	}
+	
+	
+	public function outboundRequests()
+	{
+		return $this->hasMany(outboundRequests::class, 'sales_order_id');
+	}
 }
