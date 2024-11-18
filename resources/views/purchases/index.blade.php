@@ -9,7 +9,7 @@
         <thead class="thead-dark">
 				<tr>
 				<th>ID</th>
-				<th>Supplier Name</th>
+				<th>Supplier</th>
 				<th>Purchase Date</th>
 				<th>Warehouse</th>
 				<th>Total Amount</th>
@@ -22,9 +22,9 @@
 			@foreach ($purchases as $purchase)
 				<tr>
 					<td>{{ $purchase->id }}</td>
-					<td>{{ $purchase->supplier_name }}</td>
+					<td>{{ $purchase->supplier->name ?? '' }}</td>
 					<td>{{ $purchase->purchase_date }}</td>
-					<td>{{ $purchase->warehouse->name ?? 'N/A' }}</td>
+					<td>{{ $purchase->warehouse->name ?? '' }}</td>
 					<td>{{ $purchase->total_amount }}</td>
 					<td>
 						@foreach ($purchase->products as $product)

@@ -7,33 +7,35 @@ use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\InventoryHistory;
 use App\Models\InboundRequest;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
-    // Method to show all purchases
-    public function index()
-    {
-        //$purchases = Purchase::all(); // Retrieve all purchase records
-		$purchases = Purchase::with('inboundRequests')->orderBy('id', 'desc')->get();
-        return view('purchases.index', compact('purchases')); // Pass data to the view
-    }
-
-    // You can add other methods here for creating, updating, deleting purchases as needed
-	// Show form to create a new purchase
-    public function create()
+	// Method to show all purchases
+	public function index()
 	{
-	    $warehouses = Warehouse::all();
+		//$purchases = Purchase::all(); // Retrieve all purchase records
+		$purchases = Purchase::with('inboundRequests')->orderBy('id', 'desc')->get();
+		return view('purchases.index', compact('purchases')); // Pass data to the view
+	}
+
+	// You can add other methods here for creating, updating, deleting purchases as needed
+	// Show form to create a new purchase
+	public function create()
+	{
+		$suppliers = Supplier::all();
+		$warehouses = Warehouse::all();
 		$products = Product::all();
-		return view('purchases.create', compact('products', 'warehouses'));
+		return view('purchases.create', compact('products', 'warehouses', 'suppliers'));
 	}
 
 
-    // Store the new purchase
+	// Store the new purchase
 	public function store(Request $request)
 	{
 		$request->validate([
-			'supplier_name' => 'required',
+			'supplier_id' => 'required|exists:suppliers,id',
 			'purchase_date' => 'required|date',
 			'warehouse_id' => 'required|exists:warehouses,id',
 			'products.*.product_id' => 'required|exists:products,id',
@@ -47,7 +49,7 @@ class PurchaseController extends Controller
 		}
 
 		$purchase = Purchase::create([
-			'supplier_name' => $request->supplier_name,
+			'supplier_id' => $request->supplier_id,
 			'purchase_date' => $request->purchase_date,
 			'warehouse_id' => $request->warehouse_id,
 			'total_amount' => $totalAmount,
@@ -72,22 +74,23 @@ class PurchaseController extends Controller
 		return view('purchases.show', compact('purchase'));
 	}
 
-	
+
 	// Show form to edit a specific purchase
 	public function edit($id)
 	{
+		$suppliers = Supplier::all();
 		$purchase = Purchase::with('products')->findOrFail($id);
 		$warehouses = Warehouse::all();
 		$products = Product::all(); // Fetch all available products
 
-		return view('purchases.edit', compact('purchase', 'warehouses', 'products'));
+		return view('purchases.edit', compact('purchase', 'warehouses', 'products', 'suppliers'));
 	}
 
 
 	public function update(Request $request, $id)
 	{
 		$request->validate([
-			'supplier_name' => 'required',
+			'supplier_id' => 'required',
 			'purchase_date' => 'required|date',
 			'warehouse_id' => 'required|exists:warehouses,id',
 			'products.*.product_id' => 'required|exists:products,id',
@@ -100,7 +103,7 @@ class PurchaseController extends Controller
 
 		$purchase = Purchase::findOrFail($id);
 		$purchase->update([
-			'supplier_name' => $request->supplier_name,
+			'supplier_id' => $request->supplier_id,
 			'purchase_date' => $request->purchase_date,
 			'warehouse_id' => $request->warehouse_id,
 			'notes' => $request->notes,
@@ -129,7 +132,7 @@ class PurchaseController extends Controller
 				'notes' => 'Inbound request created upon status change to In Transit',
 			]);
 		}
-		
+
 		$totalAmount = 0;
 
 		$productQuantities = [];
@@ -159,7 +162,7 @@ class PurchaseController extends Controller
 	}
 
 
-	
+
 	// Delete a specific purchase
 	public function destroy($id)
 	{
@@ -167,7 +170,6 @@ class PurchaseController extends Controller
 		$purchase->delete();
 
 		return redirect()->route('purchases.index')
-						 ->with('success', 'Purchase deleted successfully.');
+			->with('success', 'Purchase deleted successfully.');
 	}
-
 }

@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
 {
-    use HasFactory;
+	use HasFactory;
 
-    // Allow mass assignment for these fields
+	// Allow mass assignment for these fields
 	protected $fillable = [
-		'supplier_name',
+		'supplier_id',
 		'purchase_date',
 		'warehouse_id',
 		'status', // new field for status tracking
@@ -20,25 +20,29 @@ class Purchase extends Model
 		'tracking_no',
 		'total_amount'
 	];
-	
-	
+
+
 	public function products()
 	{
 		return $this->belongsToMany(Product::class, 'purchase_product')
-					->withPivot('quantity', 'buying_price', 'total_cost')
-					->withTimestamps();
+			->withPivot('quantity', 'buying_price', 'total_cost')
+			->withTimestamps();
 	}
-	
-	
+
+
 	public function warehouse()
 	{
 		return $this->belongsTo(Warehouse::class);
 	}
-	
-	
+
+
 	public function inboundRequests()
 	{
 		return $this->hasMany(InboundRequest::class, 'purchase_order_id');
 	}
 
+	public function supplier()
+	{
+		return $this->belongsTo(Supplier::class);
+	}
 }
