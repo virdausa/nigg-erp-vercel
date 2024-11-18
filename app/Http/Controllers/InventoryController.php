@@ -154,4 +154,11 @@ class InventoryController extends Controller
 		return compact('availableStock', 'incomingStock', 'outgoingStock');
 	}
 
+
+	public function reserveStock($sale)
+	{
+		foreach ($sale->products as $product) {
+			// Logic to reserve stock here (e.g., adjust inventory reservation)
+		}
+	}
 }

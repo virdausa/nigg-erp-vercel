@@ -9,7 +9,7 @@
                 <th>Warehouse</th>
                 <th>Requested Quantities</th>
                 <th>Status</th>
-                <th>Verified By</th>
+                <th>Notes</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -24,7 +24,7 @@
                         @endforeach
                     </td>
                     <td>{{ $request->status }}</td>
-                    <td>{{ $request->verifier ? $request->verifier->name : 'N/A' }}</td>
+                    <td>{{ $request->notes }}</td>
                     <td>
                         @if($request->status == 'Pending')
                             <form action="{{ route('outbound-requests.approve', $request->id) }}" method="POST" style="display:inline;">

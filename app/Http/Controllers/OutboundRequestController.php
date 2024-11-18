@@ -13,7 +13,7 @@ class OutboundRequestController extends Controller
 {
     public function index()
     {
-        $outboundRequests = OutboundRequest::with('salesOrder', 'warehouse', 'verifier')->get();
+        $outboundRequests = OutboundRequest::with('sales', 'warehouse', 'verifier')->get();
         return view('outbound_requests.index', compact('outboundRequests'));
     }
 
@@ -27,23 +27,48 @@ class OutboundRequestController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'sales_order_id' => 'required|exists:sales,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'requested_quantities' => 'required|array',
-            'requested_quantities.*' => 'integer|min:1',
-        ]);
+        $validated = $request->validate([
+			'sales_order_id' => 'required|exists:sales,id',
+			'warehouse_id' => 'required|exists:warehouses,id',
+			'requested_quantities' => 'required|array',
+			'requested_quantities.*' => 'required|integer|min:1',
+			'notes' => 'nullable|string',
+		]);
 
         OutboundRequest::create([
-            'sales_order_id' => $request->sales_order_id,
-            'warehouse_id' => $request->warehouse_id,
-            'requested_quantities' => $request->requested_quantities,
-            'status' => 'Pending',
-            'notes' => $request->notes,
-        ]);
+			'sales_order_id' => $validated['sales_order_id'],
+			'warehouse_id' => $validated['warehouse_id'],
+			'requested_quantities' => $validated['requested_quantities'],
+			'received_quantities' => [],
+			'status' => 'Requested',
+			'notes' => $validated['notes'] ?? null,
+		]);
 
-        return redirect()->route('outbound-requests.index')->with('success', 'Outbound request created.');
+        return redirect()->route('outbound_requests.index')->with('success', 'Outbound request created.');
     }
+
+	public function edit($id)
+	{
+		$outboundRequest = OutboundRequest::with('sales', 'warehouse')->findOrFail($id);
+		$expeditions = Expedition::all(); // Fetch expeditions
+		return view('outboundRequests.edit', compact('outboundRequest', 'expeditions'));
+	}
+
+	public function update(Request $request, $id)
+	{
+		$validated = $request->validate([
+			'expedition_id' => 'required|exists:expeditions,id',
+			'real_shipping_fee' => 'required|numeric|min:0',
+			'tracking_number' => 'nullable|string',
+			'real_volume' => 'nullable|numeric',
+			'real_weight' => 'nullable|numeric',
+		]);
+
+		$outboundRequest = OutboundRequest::findOrFail($id);
+		$outboundRequest->update($validated);
+
+		return redirect()->route('outboundRequests.index')->with('success', 'Outbound Request updated successfully!');
+	}
 
     public function approve($id)
     {

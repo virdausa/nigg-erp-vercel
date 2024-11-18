@@ -3,106 +3,137 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
+use App\Models\SalesProduct;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Models\Expedition;
 use Illuminate\Http\Request;
 
 class SalesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
 	{
-		$sales = Sale::with('warehouse')->orderBy('sale_date', 'desc')->get();
+		$query = Sale::with(['products.salesProducts', 'warehouse'])->orderBy('sale_date', 'desc');
+
+		// Optional: Filter by status
+		if ($request->has('status')) {
+			$query->where('status', $request->input('status'));
+		}
+
+		$sales = $query->get();
 		return view('sales.index', compact('sales'));
 	}
 
 	
 	public function create()
 	{
-		$products = Product::all();
 		$warehouses = Warehouse::all();
-		return view('sales.create', compact('products', 'warehouses'));
+		$products = Product::all();
+		$expeditions = Expedition::all(); // Fetch expeditions
+		return view('sales.create', compact('warehouses', 'products', 'expeditions'));
 	}
 
 	public function store(Request $request)
 	{
-		$request->validate([
+		$validated = $request->validate([
 			'customer_name' => 'required|string|max:255',
 			'sale_date' => 'required|date',
 			'warehouse_id' => 'required|exists:warehouses,id',
+			'products' => 'required|array', // Expecting products as an array
 			'products.*.product_id' => 'required|exists:products,id',
 			'products.*.quantity' => 'required|integer|min:1',
 			'products.*.price' => 'required|numeric|min:0',
+			'products.*.note' => 'nullable|string', // Note for each product
 		]);
 
 		// Create sale
 		$sale = Sale::create([
-			'customer_name' => $request->customer_name,
-			'sale_date' => $request->sale_date,
-			'total_amount' => 0,
-			'warehouse_id' => $request->warehouse_id,
+			'customer_name' => $validated['customer_name'],
+			'sale_date' => $validated['sale_date'],
+			'warehouse_id' => $validated['warehouse_id'],
+			'total_amount' => collect($validated['products'])->sum(function ($product) {
+				return $product['quantity'] * $product['price'];
+			}),
 		]);
 
-		$totalAmount = 0;
-		foreach ($request->products as $product) {
-			$totalAmount += $product['quantity'] * $product['price'];
-			$sale->products()->attach($product['product_id'], [
+		// Create Sales Products
+		foreach ($validated['products'] as $product) {
+			SalesProduct::create([
+				'sale_id' => $sale->id,
+				'product_id' => $product['product_id'],
 				'quantity' => $product['quantity'],
-				'price' => $product['price']
+				'price' => $product['price'],
+				'note' => $product['note'] ?? null,
 			]);
 		}
 
-		// Update total amount
-		$sale->update(['total_amount' => $totalAmount]);
-
+		$sale->save();
+	
 		return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
+	}
+
+
+	public function show($id)
+	{
+		$sale = Sale::with(['products', 'warehouse', 'expedition'])->findOrFail($id);
+		return view('sales.show', compact('sale'));
 	}
 
 
 	public function edit($id)
 	{
 		$sale = Sale::with('products')->findOrFail($id);
-		$products = Product::all();
 		$warehouses = Warehouse::all();
-		return view('sales.edit', compact('sale', 'products', 'warehouses'));
+		$products = Product::all();
+		$expeditions = Expedition::all(); // Fetch expeditions
+		return view('sales.edit', compact('sale', 'warehouses', 'products', 'expeditions'));
 	}
 
 
 	public function update(Request $request, $id)
 	{
-		$request->validate([
+		$validated = $request->validate([
 			'customer_name' => 'required|string|max:255',
 			'sale_date' => 'required|date',
 			'warehouse_id' => 'required|exists:warehouses,id',
+			'products' => 'required|array', // Validate products as an array
 			'products.*.product_id' => 'required|exists:products,id',
 			'products.*.quantity' => 'required|integer|min:1',
 			'products.*.price' => 'required|numeric|min:0',
+			'products.*.note' => 'nullable|string', // Handle product notes
+			'expedition_id' => 'required|exists:expeditions,id', // Validate expedition
+			'estimated_shipping_fee' => 'nullable|numeric|min:0',
 		]);
 
 		$sale = Sale::findOrFail($id);
 		$sale->update([
-			'customer_name' => $request->customer_name,
-			'sale_date' => $request->sale_date,
-			'warehouse_id' => $request->warehouse_id,
+			'customer_name' => $validated['customer_name'],
+			'sale_date' => $validated['sale_date'],
+			'warehouse_id' => $validated['warehouse_id'],
+			'expedition_id' => $validated['expedition_id'], // Update expedition in the same call
+			'estimated_shipping_fee' => $validated['estimated_shipping_fee'],
 		]);
 
-		// Sync products with updated quantities and prices
+		// Sync products with updated quantities, prices, and notes
 		$productData = [];
-		foreach ($request->products as $product) {
+		foreach ($validated['products'] as $product) {
 			$productData[$product['product_id']] = [
 				'quantity' => $product['quantity'],
 				'price' => $product['price'],
+				'note' => $product['note'] ?? null, // Handle notes
 			];
 		}
 		$sale->products()->sync($productData);
 
 		// Update total amount
-		$totalAmount = $sale->products->sum(function ($product) {
-			return $product->pivot->quantity * $product->pivot->price;
+		$totalAmount = collect($productData)->sum(function ($details) {
+			return $details['quantity'] * $details['price'];
 		});
 		$sale->update(['total_amount' => $totalAmount]);
 
 		return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
 	}
+
 	
 	public function destroy($id)
 	{
@@ -112,5 +143,13 @@ class SalesController extends Controller
 		return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
 	}
 
+	public function updateStatus(Sale $sale, $status)
+	{
+		// Perform validation or checks if necessary (e.g., stock availability)
+		$sale->update(['status' => $status]);
+
+		return redirect()->route('sales.edit', $sale->id)
+						 ->with('success', 'Status updated successfully!');
+	}
 
 }

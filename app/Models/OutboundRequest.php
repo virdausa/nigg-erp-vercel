@@ -10,19 +10,28 @@ class OutboundRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sales_order_id',
-        'warehouse_id',
-        'requested_quantities',
-        'status',
-        'verified_by',
-        'notes',
+        'sales_order_id', 
+        'warehouse_id', 
+        'requested_quantities', 
+		'received_quantities',
+        'status', 
+        'verified_by', 
+        'notes', 
+        'packing_fee', 
+        'shipping_fee', 
+        'tracking_number', 
+        'real_volume', 
+        'real_weight',
+		'expedition_id',
+		'real_shipping_fee',
     ];
 
     protected $casts = [
-        'requested_quantities' => 'array',
-    ];
+		'received_quantities' => 'array',
+		'requested_quantities' => 'array', // Add this line
+	];
 
-    public function salesOrder()
+    public function sales()
     {
         return $this->belongsTo(Sale::class, 'sales_order_id');
     }
@@ -36,4 +45,19 @@ class OutboundRequest extends Model
     {
         return $this->belongsTo(User::class, 'verified_by');
     }
+	
+	public function productQuantities()
+	{
+		$requestedQuantities = collect($this->requested_quantities); // Cast to Collection
+		$receivedQuantities = collect($this->received_quantities); // Cast to Collection
+
+		return $requestedQuantities->mapWithKeys(function ($quantity, $productId) use ($receivedQuantities) {
+			return [$productId => $quantity - ($receivedQuantities->get($productId, 0))];
+		});
+	}
+	
+	public function expedition()
+	{
+		return $this->belongsTo(Expedition::class);
+	}
 }

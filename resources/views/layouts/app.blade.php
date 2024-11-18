@@ -35,6 +35,9 @@
 						<li>
 							<a class="nav-link" href="{{ route('inbound_requests.index') }}">Inbound Requests</a>
 						</li>
+						<li>
+							<a class="nav-link" href="{{ route('outbound_requests.index') }}">Outbound Requests</a>
+						</li>
 					</ul>
 				</div>
 			</div>

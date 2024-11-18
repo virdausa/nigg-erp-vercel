@@ -9,13 +9,29 @@ class Sale extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['customer_name', 'sale_date', 'total_amount', 'warehouse_id'];
+    protected $fillable = [
+        'customer_name', 
+        'sale_date', 
+        'total_amount', 
+        'warehouse_id', 
+        'status', 
+        'customer_notes', 
+        'admin_notes',
+		'expedition_id',
+		'estimated_shipping_fee',
+    ];
 
     public function products()
     {
         return $this->belongsToMany(Product::class, 'sales_products')
-                    ->withPivot('quantity', 'price')
+                    ->withPivot('quantity', 'price', 'note')
                     ->withTimestamps();
+    }
+
+	// Relationship with Product
+    public function salesProducts()
+    {
+        return $this->belongsTo(SalesProduct::class);
     }
 
     public function warehouse()
@@ -30,4 +46,16 @@ class Sale extends Model
 		});
 	}
 
+
+	// Get Status Name (optional helper method for status display)
+    public function getStatusLabelAttribute()
+    {
+        return ucfirst(strtolower(str_replace('_', ' ', $this->status)));
+    }
+	
+	
+	public function expedition()
+	{
+		return $this->belongsTo(Expedition::class);
+	}
 }

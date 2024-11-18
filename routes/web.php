@@ -17,6 +17,10 @@ Route::post('/purchases/{id}/update-status', [PurchaseController::class, 'update
 
 
 Route::resource('sales', SalesController::class);
+Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
+Route::put('sales/{sale}', [SalesController::class, 'update'])->name('sales.update');
+
+
 Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 Route::get('/inventory/history', [InventoryController::class, 'history'])->name('inventory.history');
 Route::get('inventory/adjust', [InventoryController::class, 'showAdjustmentForm'])->name('inventory.adjustForm');
@@ -40,9 +44,9 @@ Route::post('/inbound_requests/{id}/complete', [InboundRequestController::class,
 
 
 // Outbound Requests
-Route::resource('outbound-requests', OutboundRequestController::class);
-Route::post('outbound-requests/{id}/approve', [OutboundRequestController::class, 'approve'])->name('outbound-requests.approve');
-Route::post('outbound-requests/{id}/execute', [OutboundRequestController::class, 'execute'])->name('outbound-requests.execute');
+Route::resource('outbound_requests', OutboundRequestController::class);
+Route::post('outbound_requests/{id}/approve', [OutboundRequestController::class, 'approve'])->name('outbound-requests.approve');
+Route::post('outbound_requests/{id}/execute', [OutboundRequestController::class, 'execute'])->name('outbound-requests.execute');
 
 
 Route::get('/dashboard', function () {
