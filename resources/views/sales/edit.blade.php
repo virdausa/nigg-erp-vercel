@@ -85,6 +85,12 @@
         </div>
 
         <!-- Action Buttons -->
+		<!-- Status Display -->
+        <div class="form-group">
+            <label for="status">Sales Status</label>
+            <input type="text" class="form-control" name="status" value="{{ $sale->status }}" readonly>
+        </div>
+		
         <h3>Actions</h3>
         <div class="mt-3">
             @if($sale->status == 'Planned')

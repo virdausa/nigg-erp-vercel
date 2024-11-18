@@ -7,6 +7,7 @@ use App\Models\SalesProduct;
 use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\Expedition;
+use App\Models\OutboundRequest;
 use Illuminate\Http\Request;
 
 class SalesController extends Controller
@@ -146,6 +147,28 @@ class SalesController extends Controller
 	public function updateStatus(Sale $sale, $status)
 	{
 		// Perform validation or checks if necessary (e.g., stock availability)
+		
+		// Set status to "Unpaid" and request outbound
+		if ($sale->status == 'Planned' && $status == 'Unpaid') {
+			$sale->status = $status;
+			$sale->save();
+
+			// Create an inbound request when moving to "In Transit"
+			$requestedQuantities = [];
+			foreach ($sale->products as $product) {
+				$requestedQuantities[$product->id] = $product->pivot->quantity;
+			}
+
+			OutboundRequest::create([
+				'sales_order_id' => $sale->id,
+				'warehouse_id' => $sale->warehouse_id,
+				'requested_quantities' => $requestedQuantities,
+				'received_quantities' => [],
+				'status' => 'Pending',
+				'notes' => 'Outbound request created upon status change to Unpaid',
+			]);
+		}
+		
 		$sale->update(['status' => $status]);
 
 		return redirect()->route('sales.edit', $sale->id)

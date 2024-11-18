@@ -7,6 +7,7 @@ use App\Models\Warehouse;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\InventoryHistory;
+use App\Models\Expedition;
 use Illuminate\Http\Request;
 
 class OutboundRequestController extends Controller
@@ -51,7 +52,7 @@ class OutboundRequestController extends Controller
 	{
 		$outboundRequest = OutboundRequest::with('sales', 'warehouse')->findOrFail($id);
 		$expeditions = Expedition::all(); // Fetch expeditions
-		return view('outboundRequests.edit', compact('outboundRequest', 'expeditions'));
+		return view('outbound_requests.edit', compact('outboundRequest', 'expeditions'));
 	}
 
 	public function update(Request $request, $id)
@@ -67,7 +68,7 @@ class OutboundRequestController extends Controller
 		$outboundRequest = OutboundRequest::findOrFail($id);
 		$outboundRequest->update($validated);
 
-		return redirect()->route('outboundRequests.index')->with('success', 'Outbound Request updated successfully!');
+		return redirect()->route('outbound_requests.index')->with('success', 'Outbound Request updated successfully!');
 	}
 
     public function approve($id)
@@ -78,7 +79,7 @@ class OutboundRequestController extends Controller
             'verified_by' => auth()->user()->id,
         ]);
 
-        return redirect()->route('outbound-requests.index')->with('success', 'Outbound request approved.');
+        return redirect()->route('outbound_requests.index')->with('success', 'Outbound request approved.');
     }
 
     public function execute($id)
@@ -104,6 +105,6 @@ class OutboundRequestController extends Controller
 
         $outboundRequest->update(['status' => 'Shipped']);
 
-        return redirect()->route('outbound-requests.index')->with('success', 'Outbound request executed and products shipped.');
+        return redirect()->route('outbound_requests.index')->with('success', 'Outbound request executed and products shipped.');
     }
 }

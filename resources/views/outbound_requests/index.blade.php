@@ -7,8 +7,8 @@
             <tr>
                 <th>Sales Order</th>
                 <th>Warehouse</th>
-                <th>Requested Quantities</th>
                 <th>Status</th>
+                <th>Requested Quantities</th>
                 <th>Notes</th>
                 <th>Actions</th>
             </tr>
@@ -16,29 +16,21 @@
         <tbody>
             @foreach($outboundRequests as $request)
                 <tr>
-                    <td>{{ $request->salesOrder->id }}</td>
+                    <td>{{ $request->sales->id }}</td>
                     <td>{{ $request->warehouse->name }}</td>
+                    <td>{{ $request->status }}</td>
                     <td>
-                        @foreach ($request->requested_quantities as $productId => $quantity)
-                            {{ $request->warehouse->products->find($productId)->name }}: {{ $quantity }}<br>
+                        @foreach ($request->received_quantities as $productId => $quantity)
+                            {{ $request->sales->products->find($productId)->name }}: {{ $request->requested_quantities[$productId] }} / {{ $qty }}{{ $quantity }}<br>
                         @endforeach
                     </td>
-                    <td>{{ $request->status }}</td>
                     <td>{{ $request->notes }}</td>
                     <td>
-                        @if($request->status == 'Pending')
-                            <form action="{{ route('outbound-requests.approve', $request->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-success">Approve</button>
-                            </form>
-                        @endif
-                        @if($request->status == 'Approved')
-                            <form action="{{ route('outbound-requests.execute', $request->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-primary">Ship</button>
-                            </form>
-                        @endif
-                    </td>
+						<a href="{{ route('outbound_requests.show', $request->id) }}" class="btn btn-info">Show</a>
+						@if ($request->status !== 'Completed')
+							<a href="{{ route('outbound_requests.edit', $request->id) }}" class="btn btn-primary">Update</a>
+						@endif
+					</td>
                 </tr>
             @endforeach
         </tbody>
