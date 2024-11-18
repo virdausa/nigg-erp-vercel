@@ -11,6 +11,9 @@
             <a href="{{ route('purchases.index') }}">Manage Purchases</a>
         </li>
         <li class="list-group-item">
+            <a href="{{ route('suppliers.index') }}">Manage Suppliers</a>
+        </li>
+        <li class="list-group-item">
             <a href="{{ route('products.index') }}">Manage Products</a>
         </li>
         <li class="list-group-item">

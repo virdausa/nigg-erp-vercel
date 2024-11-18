@@ -7,6 +7,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\SupplierController;
 
 Route::resource('products', ProductController::class);
 
@@ -47,6 +48,9 @@ Route::post('/inbound_requests/{id}/complete', [InboundRequestController::class,
 Route::resource('outbound_requests', OutboundRequestController::class);
 Route::post('outbound_requests/{id}/approve', [OutboundRequestController::class, 'approve'])->name('outbound-requests.approve');
 Route::post('outbound_requests/{id}/execute', [OutboundRequestController::class, 'execute'])->name('outbound-requests.execute');
+
+
+Route::resource('suppliers', SupplierController::class);
 
 
 Route::get('/dashboard', function () {
