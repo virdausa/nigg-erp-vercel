@@ -73,6 +73,8 @@ class OutboundRequestController extends Controller
 				->get();
 		}
 		
+		//dd($outboundRequestLocations);
+
 		return view('outbound_requests.edit', compact('outboundRequest', 'expeditions', 'availableLocations', 'warehouses', 'outboundRequestLocations'));
 	}
 
@@ -97,43 +99,6 @@ class OutboundRequestController extends Controller
 		]);
 
 		$outboundRequest->update($validated);
-	
-		$locationData = $validated['locations'];
-
-		// validate total quantity
-		$totalQuantity = 0;
-		foreach ($locationData as $productId => $locations) {
-			foreach ($locations as $location) {
-				$totalQuantity += $location['quantity'];
-			}
-			if ($totalQuantity != $outboundRequest->requested_quantities[$productId]) {
-				return back()->withErrors(['error' => "Total quantity for product ID $productId does not match the requested quantity."]);	
-			}
-		}
-	
-		// Save locations
-		foreach ($locationData as $productId => $locations) {
-			foreach ($locations as $location) {
-				$qty = $location['quantity'];
-				$location = Location::find($location['location_id']);
-				$outboundRequestLocation = OutboundRequestLocation::where('outbound_request_id', $outboundRequest->id)
-					->where('product_id', $productId)
-					->where('location_id', $location->id)
-					->first();
-
-				if ($outboundRequestLocation) {
-					$outboundRequestLocation->update(['quantity' => $qty]);
-				} else {
-					OutboundRequestLocation::create([
-						'outbound_request_id' => $outboundRequest->id,
-						'product_id' => $productId,
-						'room' => $location['room'],
-						'rack' => $location['rack'],
-						'quantity' => $qty,	
-					]);
-				}
-			}
-		}
 
 		// Handle deleted locations
 		if (!empty($request->input('deleted_locations'))) {
@@ -141,6 +106,44 @@ class OutboundRequestController extends Controller
 			OutboundRequestLocation::where('outbound_request_id', $id)
 				->whereIn('location_id', $deletedLocationIds)
 				->delete();
+		}
+	
+		// Save or update locations
+		if (isset($validated['locations'])) {
+			foreach ($validated['locations'] as $productId => $locations) {
+				$totalQuantity = 0;
+				foreach ($locations as $locationData) {
+					if (isset($locationData['location_id']) && !empty($locationData['location_id'])) {
+						$qty_in_location = Inventory::where('warehouse_id', $outboundRequest->warehouse_id)
+							->where('product_id', $productId)
+							->where('location_id', $locationData['location_id'])
+							->sum('quantity');
+
+						// validate if qty in location is more than requested qty
+						if ($qty_in_location < $locationData['quantity']) {
+							return back()->withErrors(['error' => 'Quantity in location is less than requested quantity for product ID ' . $productId]);
+						}
+
+						$totalQuantity += $locationData['quantity'];
+
+						$outboundRequestLocation = OutboundRequestLocation::updateOrCreate(
+							[
+								'outbound_request_id' => $outboundRequest->id,
+								'product_id' => $productId,
+								'location_id' => $locationData['location_id'],
+							],
+							[
+								'quantity' => $locationData['quantity'],
+							]
+						);
+					}
+				}
+
+				// validate if total quantity is more than requested qty
+				if ($totalQuantity < $outboundRequest->requested_quantities[$productId]) {
+					return back()->withErrors(['error' => 'Total quantity is less than requested quantity for product ID ' . $productId]);
+				}	
+			}
 		}
 
 		if (($request['submit'])) {
@@ -191,6 +194,7 @@ class OutboundRequestController extends Controller
                 ]);
 
                 $outboundRequest->update(array_merge($validated, ['status' => $status]));
+				$this->updateSalesStatus($outboundRequest->sales_order_id);
 
                 return redirect()->route('outbound_requests.edit', $outboundRequest->id)
                                  ->with('success', 'Status updated to In Transit.');
@@ -254,4 +258,31 @@ class OutboundRequestController extends Controller
 						 ->with('success', 'Stock verified and status updated to Pending Confirmation.');
 	}
 
+
+
+	// Helper function to update sales status based on outbound requests
+	private function updateSalesStatus($salesId)
+	{
+		$sales = Sale::with('outboundRequests')->findOrFail($salesId);
+		$outboundRequests = $sales->outboundRequests;
+
+		if ($outboundRequests->every(fn($or) => $or->status === 'Completed')) {
+			// All outbound requests are completed
+			$sales->status = 'Completed';
+		} elseif ($outboundRequests->contains('status', 'Customer Complaint')) {
+			// If any request has a customer complaint
+			$sales->status = 'Customer Complaint';
+		} elseif ($outboundRequests->contains('status', 'In Transit') && $outboundRequests->contains('status', 'Completed')) {
+			// There’s at least one completed request, but some are still in transit
+			$sales->status = 'Customer Complaint';
+		} elseif ($outboundRequests->every(fn($or) => $or->status === 'Ready to Complete')) {
+			// All outbound requests are ready to complete
+			$sales->status = 'Ready to Complete';
+		} else {
+			// Default to "Planned" if none of the above conditions are met
+			$sales->status = 'In Transit';
+		}
+
+		$sales->save();
+	}
 }

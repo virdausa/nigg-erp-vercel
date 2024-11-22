@@ -45,29 +45,33 @@
 									<tr>
 										<th>Room & Rack</th>
 										<th>Quantity</th>
-										<th>Action</th>
+                                        @if ($outboundRequest->status == 'Packing & Shipping')
+    										<th>Action</th>
+                                        @endif
 									</tr>
 								</thead>
 								<tbody id="locations-{{ $productId }}">
-									@if (count($outboundRequest->locations) > 0)
-                                        @foreach ($outboundRequest->locations as $location)
+									@if (count($outboundRequestLocations) > 0)
+                                        @foreach ($outboundRequestLocations[$productId] as $key => $location)
                                             <tr>
                                                 <td>
-                                                    <select name="locations[{{ $location->product_id }}][][room]" class="form-control">
+                                                    <select name="locations[{{ $location->product_id }}][{{ $key }}][location_id]" class="form-control {{ $outboundRequest->status != 'Packing & Shipping' ? 'readonly-select' : '' }}" {{ $outboundRequest->status != 'Packing & Shipping' ? 'readonly' : '' }} required>
                                                         @foreach ($availableLocations[$location->product_id] as $availableLocation)
                                                             <option value="{{ $availableLocation->id }}"
-                                                                    {{ $availableLocation->id == $location->id ? 'selected' : '' }}>
+                                                                    {{ $availableLocation->id == $location->location_id ? 'selected' : '' }}>
                                                                 Room: {{ $availableLocation->room }}, Rack: {{ $availableLocation->rack }} (Available: {{ $availableLocation->quantity }})
                                                             </option>
                                                         @endforeach
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="number" name="locations[{{ $location->product_id }}][][quantity]" value="{{ $location->quantity }}" class="form-control">
+                                                    <input type="number" name="locations[{{ $location->product_id }}][{{ $key }}][quantity]" value="{{ $location->quantity }}" class="form-control" {{ $outboundRequest->status != 'Packing & Shipping' ? 'readonly' : '' }} required>
                                                 </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger remove-location">Remove</button>
-                                                </td>
+                                                @if ($outboundRequest->status == 'Packing & Shipping')
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger remove-location">Remove</button>
+                                                    </td>
+                                                @endif
                                             </tr>
                                         @endforeach
 									@else
@@ -77,14 +81,16 @@
 									@endif
 								</tbody>
 							</table>
-                            <input type="hidden" id="deleted_locations" name="deleted_locations" value="">
-							<button type="button" class="btn btn-secondary add-location" data-product-id="{{ $productId }}">Add Location</button>
+                            @if ($outboundRequest->status == 'Packing & Shipping')
+							    <button type="button" class="btn btn-secondary add-location" data-product-id="{{ $productId }}">Add Location</button>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-
+        <input type="hidden" id="deleted_locations" name="deleted_locations" value="">
+            
         <div class="form-group">
             <label for="notes">Notes</label>
             <textarea name="notes" class="form-control" placeholder="Optional notes">{{ $outboundRequest->notes }}</textarea>
@@ -145,20 +151,18 @@
                 @break
 
             @case('Packing & Shipping')
-                <button type="submit" class="btn btn-warning">Mark as Shipped</button>
+                <button name='submit' type="submit" class="btn btn-warning" value="Mark as Shipped">Mark as Shipped</button>
                 @break
 
             @case('In Transit')
-                <a href="{{ route('outbound_requests.updateStatus', ['outboundRequest' => $outboundRequest->id, 'status' => 'Ready to Complete']) }}" class="btn btn-info">Mark as Delivered</a>
-                <a href="{{ route('outbound_requests.updateStatus', ['outboundRequest' => $outboundRequest->id, 'status' => 'Customer Complaint']) }}" class="btn btn-danger">Mark as Customer Complaint</a>
                 @break
 
             @case('Customer Complaint')
-                <a href="{{ route('outbound_requests.updateStatus', ['outboundRequest' => $outboundRequest->id, 'status' => 'Ready to Complete']) }}" class="btn btn-primary">Resolve Complaint</a>
+                <button name='submit' type="submit" class="btn btn-warning" value="Resolve Quantity Problem">Resolve Quantity Problem</button>
                 @break
 
             @case('Ready to Complete')
-                <a href="{{ route('outbound_requests.updateStatus', ['outboundRequest' => $outboundRequest->id, 'status' => 'Completed']) }}" class="btn btn-success">Complete Request</a>
+                <a href="{{ route('outbound_requests.complete', $outboundRequest->id) }}" class="btn btn-primary">Complete Request</a>
                 @break
         @endswitch
 
@@ -183,52 +187,43 @@
     </script>
 	
 	<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.add-location').forEach((button) => {
-                button.addEventListener('click', function () {
-                    const productId = this.dataset.productId;
-                    const tbody = document.getElementById(`locations-${productId}`);
-                    const rowCount = tbody.querySelectorAll('tr').length;
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.add-location').forEach((button) => {
+            button.addEventListener('click', function () {
+                const productId = this.dataset.productId;
+                const tbody = document.getElementById(`locations-${productId}`);
+                const rowCount = tbody.querySelectorAll('tr').length;
 
-                    // Add a new row
-                    const newRow = `
-                        <tr>
-                            <td>
-                                <select name="locations[${productId}][${rowCount}][location_id]" class="form-control location-select">
-                                    <option value="" selected>Select a location</option>
-                                    @foreach ($availableLocations[$productId] as $location)
-                                        <option value="{{ $location->id }}">
-                                            Room: {{ $location->room }}, Rack: {{ $location->rack }} (Available: {{ $location->quantity }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <input type="number" name="locations[${productId}][${rowCount}][quantity]" class="form-control" value="0">
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger remove-location">Remove</button>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.insertAdjacentHTML('beforeend', newRow);
+                // Add a new row
+                const newRow = `
+                    <tr>
+                        <td>
+                            <select name="locations[${productId}][${rowCount}][location_id]" class="form-control location-select">
+                                <option value="" selected>Select a location</option>
+                                @foreach ($availableLocations[$productId] as $location)
+                                    <option value="{{ $location->id }}">
+                                        Room: {{ $location->room }}, Rack: {{ $location->rack }} (Available: {{ $location->quantity }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="locations[${productId}][${rowCount}][quantity]" class="form-control" value="0">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger remove-location">Remove</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', newRow);
 
-                    // Add remove event listener to the newly added row
-                    tbody.querySelectorAll('.remove-location').forEach((removeButton) => {
-                        removeButton.addEventListener('click', function () {
-                            const row = this.closest('tr');
-                            const locationId = row.querySelector('select[name*="[location_id]"]').value;
-                            if (locationId) {
-                                const deletedLocationsInput = document.getElementById('deleted_locations');
-                                deletedLocationsInput.value += `${locationId},`;
-                            }
-                            row.remove();
-                        });
-                    });
-                });
+                // Reattach remove event listeners
+                attachRemoveListeners();
             });
+        });
 
-            // Add remove event listeners for removing existing rows on page load
+        // Attach event listeners for all remove-location buttons
+        function attachRemoveListeners() {
             document.querySelectorAll('.remove-location').forEach((removeButton) => {
                 removeButton.addEventListener('click', function () {
                     const row = this.closest('tr');
@@ -240,8 +235,11 @@
                     row.remove();
                 });
             });
-        });
+        }
 
+        // Initial attachment of remove listeners
+        attachRemoveListeners();
+    });
     </script>
 	
 	<script>

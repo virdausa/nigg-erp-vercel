@@ -109,6 +109,8 @@ class SalesController extends Controller
 			'products.*.note' => 'nullable|string', // Handle product notes
 			'expedition_id' => 'required|exists:expeditions,id', // Validate expedition
 			'estimated_shipping_fee' => 'nullable|numeric|min:0',
+			'received_quantities' => 'required|array',
+	        'received_quantities.*.*' => 'nullable|integer|min:0',
 		]);
 
 		$sale = Sale::findOrFail($id);
@@ -137,6 +139,50 @@ class SalesController extends Controller
 		});
 		$sale->update(['total_amount' => $totalAmount]);
 
+		if($sale->status == 'In Transit') {
+			
+			// Update received quantities
+			$receivedQuantities = $validated['received_quantities'];
+			$receivedQuantitiesSales = [];
+			foreach($receivedQuantities as $outboundRequestId => $receivedQuantitiesEachOuboundRequest) {
+				$outboundRequest = OutboundRequest::findOrFail($outboundRequestId);
+				
+				foreach($receivedQuantitiesEachOuboundRequest as $productId => $receivedQuantity) {
+					if(isset($receivedQuantitiesSales[$productId])) {
+						$receivedQuantitiesSales[$productId] += $receivedQuantity;
+					} else {
+						$receivedQuantitiesSales[$productId] = $receivedQuantity;
+					}
+				}
+				
+				$outboundRequest->update(['received_quantities' => $receivedQuantitiesEachOuboundRequest]);
+
+				if($outboundRequest->status = 'In Transit'){
+					if($outboundRequest->received_quantities == $outboundRequest->requested_quantities) {
+						$outboundRequest->update(['status' => 'Ready to Complete']);
+					} else {
+						$outboundRequest->update(['status' => 'Customer Complaint']);
+					}
+				}
+
+				$outboundRequest->save();
+			}
+
+			// check whether all received quantities are correct
+			$allReceivedCorrectly = true;
+			foreach(collect($sale->requested_quantities) as $productId => $requestedQuantity) {
+				if($receivedQuantitiesSales[$productId] != $requestedQuantity) {
+					$allReceivedCorrectly = false;
+				}
+			}
+
+			if($allReceivedCorrectly){
+				$sale->update(['status' => 'Completed']);
+			} else {
+				$sale->update(['status' => 'Customer Complaint']);
+			}
+		}
+		
 		return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
 	}
 

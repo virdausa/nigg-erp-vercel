@@ -62,7 +62,7 @@ class Sale extends Model
 	
 	public function outboundRequests()
 	{
-		return $this->hasMany(outboundRequests::class, 'sales_order_id');
+		return $this->hasMany(outboundRequest::class, 'sales_order_id');
 	}
 
 

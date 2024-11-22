@@ -34,6 +34,7 @@ Route::get('/inventory/getLocations/warehouses/{warehouse}/products/{product}/lo
 
 use App\Http\Controllers\InboundRequestController;
 use App\Http\Controllers\OutboundRequestController;
+use App\Models\OutboundRequest;
 
 Route::resource('warehouses', WarehouseController::class);
 Route::resource('locations', LocationController::class);
@@ -49,6 +50,7 @@ Route::post('/inbound_requests/{id}/complete', [InboundRequestController::class,
 Route::resource('outbound_requests', OutboundRequestController::class);
 Route::get('/outbound_requests/{outboundRequest}/check-stock', [OutboundRequestController::class, 'checkStockAvailability'])->name('outbound_requests.checkStock');
 Route::get('/outbound_requests/{outboundRequest}/reject', [OutboundRequestController::class, 'rejectRequest'])->name('outbound_requests.reject');
+Route::get('/outbound_requests/{id}/complete', [OutboundRequestController::class, 'complete'])->name('outbound_requests.complete');
 
 
 Route::resource('suppliers', SupplierController::class);

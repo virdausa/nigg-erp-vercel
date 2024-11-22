@@ -21,7 +21,7 @@
                     <td>{{ $request->status }}</td>
                     <td>
                         @foreach ($request->received_quantities as $productId => $quantity)
-                            {{ $request->sales->products->find($productId)->name }}: {{ $request->requested_quantities[$productId] }} / {{ $qty }}{{ $quantity }}<br>
+                            {{ $request->sales->products->find($productId)->name }}: {{ $request->requested_quantities[$productId] }} / {{ $quantity }}<br>
                         @endforeach
                     </td>
                     <td>{{ $request->notes }}</td>
