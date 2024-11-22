@@ -9,17 +9,17 @@
         
         <div class="form-group">
             <label for="customer_name">Customer Name</label>
-            <input type="text" name="customer_name" class="form-control" value="{{ $sale->customer_name }}" required>
+            <input type="text" name="customer_name" class="form-control" value="{{ $sale->customer_name }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
         </div>
         
         <div class="form-group">
             <label for="sale_date">Sale Date</label>
-            <input type="date" name="sale_date" class="form-control" value="{{ $sale->sale_date }}" required>
+            <input type="date" name="sale_date" class="form-control" value="{{ $sale->sale_date }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
         </div>
         
         <div class="form-group">
             <label for="warehouse_id">Select Warehouse</label>
-            <select name="warehouse_id" class="form-control" required>
+            <select name="warehouse_id" class="form-control {{ $sale->status != 'Planned' ? 'readonly-select' : '' }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
                 @foreach($warehouses as $warehouse)
                     <option value="{{ $warehouse->id }}" {{ $sale->warehouse_id == $warehouse->id ? 'selected' : '' }}>
                         {{ $warehouse->name }}
@@ -43,7 +43,7 @@
             @foreach ($sale->products as $index => $product)
                 <div class="form-group">
                     <label for="products[{{ $index }}][product_id]">Product</label>
-                    <select name="products[{{ $index }}][product_id]" class="form-control" required>
+                    <select name="products[{{ $index }}][product_id]" class="form-control {{ $sale->status != 'Planned' ? 'readonly-select' : '' }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
                         @foreach ($products as $availableProduct)
                             <option value="{{ $availableProduct->id }}" {{ $product->id == $availableProduct->id ? 'selected' : '' }}>
                                 {{ $availableProduct->name }} - ${{ $availableProduct->price }}
@@ -51,11 +51,11 @@
                         @endforeach
                     </select>
                     <label for="products[{{ $index }}][quantity]">Quantity</label>
-                    <input type="number" name="products[{{ $index }}][quantity]" class="form-control" value="{{ $product->pivot->quantity }}" required>
+                    <input type="number" name="products[{{ $index }}][quantity]" class="form-control" value="{{ $product->pivot->quantity }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
                     <label for="products[{{ $index }}][price]">Price</label>
-                    <input type="number" step="0.01" name="products[{{ $index }}][price]" class="form-control" value="{{ $product->pivot->price }}" required>
+                    <input type="number" step="0.01" name="products[{{ $index }}][price]" class="form-control" value="{{ $product->pivot->price }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
                     <label for="products[{{ $index }}][note]">Note</label>
-                    <textarea name="products[{{ $index }}][note]" class="form-control">{{ $product->pivot->note }}</textarea>
+                    <textarea name="products[{{ $index }}][note]" class="form-control" {{ $sale->status != 'Planned' ? 'readonly' : '' }}>{{ $product->pivot->note }}</textarea>
                 </div>
             @endforeach
         </div>
@@ -65,7 +65,7 @@
         <h3>Expedition Details</h3>
         <div class="form-group">
             <label for="expedition_id">Expedition</label>
-            <select name="expedition_id" class="form-control">
+            <select name="expedition_id" class="form-control {{ $sale->status != 'Planned' ? 'readonly-select' : '' }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
                 @foreach($expeditions as $expedition)
                     <option value="{{ $expedition->id }}" {{ $sale->expedition_id == $expedition->id ? 'selected' : '' }}>
                         {{ $expedition->name }}
@@ -75,7 +75,7 @@
         </div>
         <div class="form-group">
             <label for="estimated_shipping_fee">Estimated Shipping Fee</label>
-            <input type="number" name="estimated_shipping_fee" class="form-control" value="{{ $sale->estimated_shipping_fee }}">
+            <input type="number" name="estimated_shipping_fee" class="form-control" value="{{ $sale->estimated_shipping_fee }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
         </div>
 
         <h3>Complaint Details (if any)</h3>
@@ -85,29 +85,46 @@
         </div>
 
 		<!-- Status Display -->
+		<h3>Status Display</h3>
         <div class="form-group">
             <label for="status">Sales Status</label>
             <input type="text" class="form-control" name="status" value="{{ $sale->status }}" readonly>
         </div>
-		<div class="form-group">
-            <label for="status_outbound">Outbound Status</label>
-            <input type="text" class="form-control" value="{{ $outboundRequests[count($outboundRequests)-1]->status }}" readonly>
-        </div>
+		@if (count($outboundRequests) > 0)
+			<div class="form-group">
+				<label for="status_outbound">Outbound Status</label>
+				<input type="text" class="form-control" value="{{ $outboundRequests[count($outboundRequests)-1]->status }}" readonly>
+			</div>
+		@endif
 		
         <!-- Action Buttons -->
         <h3>Actions</h3>
         <div class="mt-3">
-            @if($sale->status == 'Planned')
-                <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Unpaid']) }}" class="btn btn-primary mb-3">Request Outbound</a>
-            @elseif($sale->status == 'Unpaid')
-                <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Pending Shipment']) }}" class="btn btn-success mb-3">Mark as Paid</a>
-            @elseif($sale->status == 'In Transit')
-                <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Received - Pending Verification']) }}" class="btn btn-info mb-3">Mark as Received</a>
-            @elseif($sale->status == 'Customer Complaint')
-                <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Completed']) }}" class="btn btn-success mb-3">Resolve Complaint & Complete</a>
-            @elseif($sale->status == 'Received - Pending Verification')
-                <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Completed']) }}" class="btn btn-success mb-3">Complete Order</a>
-            @endif
+            @switch($sale->status)
+                @case('Planned')
+                    <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Unpaid']) }}" class="btn btn-primary mb-3">Request Outbound</a>
+                    @break
+
+                @case('Unpaid')
+                    @if($outboundRequests[count($outboundRequests)-1]->status == 'Pending Confirmation')
+                        <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Pending Shipment']) }}" class="btn btn-success mb-3">Mark as Paid</a>
+                    @else
+                        <h4>Waiting Outbound Request Confirmation before can be Paid</h4>
+                    @endif
+                    @break
+
+                @case('In Transit')
+                    <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Received - Pending Verification']) }}" class="btn btn-info mb-3">Mark as Received</a>
+                    @break
+
+                @case('Customer Complaint')
+                    <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Completed']) }}" class="btn btn-success mb-3">Resolve Complaint & Complete</a>
+                    @break
+
+                @case('Received - Pending Verification')
+                    <a href="{{ route('sales.updateStatus', ['sale' => $sale->id, 'status' => 'Completed']) }}" class="btn btn-success mb-3">Complete Order</a>
+                    @break
+            @endswitch
         </div>
 
         <button type="submit" class="btn btn-primary mb-3">Update Sale</button>
@@ -138,4 +155,18 @@
             productIndex++;
         });
     </script>
+	<script>
+    // JavaScript to prevent selection changes on readonly-select elements
+    document.querySelectorAll('.readonly-select').forEach(function(select) {
+        select.addEventListener('mousedown', function(event) {
+            event.preventDefault();
+        });
+        select.addEventListener('click', function(event) {
+            event.preventDefault();
+        });
+        select.addEventListener('change', function(event) {
+            event.preventDefault();
+        });
+    });
+	</script>
 @endsection

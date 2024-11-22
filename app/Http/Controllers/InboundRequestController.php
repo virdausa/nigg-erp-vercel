@@ -259,18 +259,25 @@ class InboundRequestController extends Controller
 			
 			
 			// Check if the product already exists in the inventory for the specified warehouse
-			$inventory = Inventory::firstOrCreate(
-				[
+			// Check if the product already exists in the inventory for the specified warehouse and location
+			$inventory = Inventory::where('product_id', $productId)
+								  ->where('warehouse_id', $inboundRequest->warehouse_id)
+								  ->where('location_id', $location->id)
+								  ->first();
+			if ($inventory) {
+				// If the inventory entry exists, update the quantity
+				$receivedQuantity = $inboundRequest->received_quantities[$productId] ?? 0;
+				$inventory->quantity += $receivedQuantity;
+				$inventory->save();
+			} else {
+				// If no inventory entry exists for this location, create a new one
+				Inventory::create([
 					'product_id' => $productId,
-					'warehouse_id' => $inboundRequest->warehouse_id
-				],
-				['quantity' => 0]
-			);
-
-			// Update the inventory quantity
-			$receivedQuantity = $inboundRequest->received_quantities[$productId] ?? 0;
-			$inventory->quantity += $receivedQuantity;
-			$inventory->save();
+					'warehouse_id' => $inboundRequest->warehouse_id,
+					'location_id' => $location->id,
+					'quantity' => $inboundRequest->received_quantities[$productId] ?? 0,
+				]);
+			}
 		}
 
 		// Mark the inbound request as completed

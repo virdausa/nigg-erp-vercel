@@ -27,6 +27,8 @@ Route::get('/inventory/history', [InventoryController::class, 'history'])->name(
 Route::get('inventory/adjust', [InventoryController::class, 'showAdjustmentForm'])->name('inventory.adjustForm');
 Route::post('inventory/adjust', [InventoryController::class, 'adjustInventory'])->name('inventory.adjust');
 Route::get('/inventory/get-locations/{warehouseId}', [InventoryController::class, 'getLocationsByWarehouse']);
+Route::get('/inventory/getProductStock/warehouses/{warehouse}/products/{product}/stock', [InventoryController::class, 'getProductStock']);
+Route::get('/inventory/getLocations/warehouses/{warehouse}/products/{product}/locations', [InventoryController::class, 'getLocations']);
 
 
 use App\Http\Controllers\InboundRequestController;

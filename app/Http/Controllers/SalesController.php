@@ -87,7 +87,7 @@ class SalesController extends Controller
 		$warehouses = Warehouse::all();
 		$products = Product::all();
 		$expeditions = Expedition::all(); // Fetch expeditions
-		$outboundRequests = OutboundRequest::all(); // Fetch OutboundRequest
+		$outboundRequests = OutboundRequest::where('sales_order_id', $id)->get(); // Fetch related OutboundRequest
 		return view('sales.edit', compact('sale', 'warehouses', 'products', 'expeditions', 'outboundRequests'));
 	}
 
@@ -177,7 +177,8 @@ class SalesController extends Controller
 			
 			// Update the related Outbound Request status
 			$outboundRequest = OutboundRequest::where('sales_order_id', $sale->id)
-												->where('status', 'Pending Confirmation')->last();
+												->where('status', 'Pending Confirmation')
+												->latest()->first();
 			if ($outboundRequest) {
 				$outboundRequest->status = 'Packing & Shipping';
 				$outboundRequest->save();

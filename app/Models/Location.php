@@ -21,4 +21,9 @@ class Location extends Model
     {
         return $this->hasMany(Inventory::class);
     }
+	
+	public function locations()
+	{
+		return $this->hasMany(OutboundRequestLocation::class);
+	}
 }

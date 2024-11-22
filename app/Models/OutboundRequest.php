@@ -60,4 +60,10 @@ class OutboundRequest extends Model
 	{
 		return $this->belongsTo(Expedition::class);
 	}
+	
+	
+	public function locations()
+	{
+		return $this->hasMany(OutboundRequestLocation::class);
+	}
 }

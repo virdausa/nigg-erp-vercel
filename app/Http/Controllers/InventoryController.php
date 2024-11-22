@@ -161,4 +161,28 @@ class InventoryController extends Controller
 			// Logic to reserve stock here (e.g., adjust inventory reservation)
 		}
 	}
+	
+	
+	public function getProductStock($warehouseId, $productId)
+	{
+		// Fetch the stock for the specified product in the specified warehouse
+		$stock = Inventory::where('warehouse_id', $warehouseId)
+						  ->where('product_id', $productId)
+						  ->sum('quantity');
+
+		return response()->json(['stock' => $stock]);
+	}
+
+	
+	public function getLocations($warehouseId, $productId)
+	{
+		$locations = Inventory::where('warehouse_id', $warehouseId)
+			->where('product_id', $productId)
+			->with('location') // Ensure relationship with `Location` model exists
+			->get(['location_id', 'quantity']);
+
+		return response()->json($locations);
+	}
+
+
 }
