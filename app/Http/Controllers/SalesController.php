@@ -77,7 +77,7 @@ class SalesController extends Controller
 
 
 	public function show($id)
-	{
+ 	{
 		$sale = Sale::with(['products', 'warehouse', 'expedition', 'customer'])->findOrFail($id);
 		return view('sales.show', compact('sale'));
 	}
@@ -91,7 +91,8 @@ class SalesController extends Controller
 		$products = Product::all();
 		$expeditions = Expedition::all(); // Fetch expeditions
 		$outboundRequests = OutboundRequest::where('sales_order_id', $id)->get(); // Fetch related OutboundRequest
-		return view('sales.edit', compact('sale', 'warehouses', 'products', 'expeditions', 'outboundRequests'));
+		
+		return view('sales.edit', compact('sale', 'warehouses', 'products', 'expeditions', 'outboundRequests', 'customers'));
 	}
 
 
