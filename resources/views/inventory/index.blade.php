@@ -19,7 +19,8 @@
                 <th>Product</th>
                 <th>Available Stock</th>
                 <th>Incoming Stock</th>
-                <th>Outgoing Stock</th>
+                <th>Reserved Stock</th>
+                <th>In Transit Stock</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +29,8 @@
                     <td>{{ $inventory->product->name }}</td>
                     <td>{{ $inventory->quantity }}</td>
                     <td>0</td> <!-- Replace with logic for incoming -->
-                    <td>0</td> <!-- Replace with logic for outgoing -->
+                    <td>{{ $inventory->reserved_quantity }}</td> 
+                    <td>{{ $inventory->in_transit_quantity }}</td>
                 </tr>
             @endforeach
         </tbody>

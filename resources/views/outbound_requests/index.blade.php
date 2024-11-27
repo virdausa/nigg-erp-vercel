@@ -27,7 +27,7 @@
                     <td>{{ $request->notes }}</td>
                     <td>
 						<a href="{{ route('outbound_requests.show', $request->id) }}" class="btn btn-info">Show</a>
-						@if ($request->status !== 'Completed')
+						@if ($request->status != 'Ready to Complete' && $request->status != 'Completed')
 							<a href="{{ route('outbound_requests.edit', $request->id) }}" class="btn btn-primary">Update</a>
 						@endif
 					</td>

@@ -45,7 +45,7 @@
 									<tr>
 										<th>Room & Rack</th>
 										<th>Quantity</th>
-                                        @if ($outboundRequest->status == 'Packing & Shipping')
+                                        @if ($outboundRequest->status == 'Requested')
     										<th>Action</th>
                                         @endif
 									</tr>
@@ -55,7 +55,7 @@
                                         @foreach ($outboundRequestLocations[$productId] as $key => $location)
                                             <tr>
                                                 <td>
-                                                    <select name="locations[{{ $location->product_id }}][{{ $key }}][location_id]" class="form-control {{ $outboundRequest->status != 'Packing & Shipping' ? 'readonly-select' : '' }}" {{ $outboundRequest->status != 'Packing & Shipping' ? 'readonly' : '' }} required>
+                                                    <select name="locations[{{ $location->product_id }}][{{ $key }}][location_id]" class="form-control {{ $outboundRequest->status != 'Requested' ? 'readonly-select' : '' }}" {{ $outboundRequest->status != 'Requested' ? 'readonly' : '' }} required>
                                                         @foreach ($availableLocations[$location->product_id] as $availableLocation)
                                                             <option value="{{ $availableLocation->id }}"
                                                                     {{ $availableLocation->id == $location->location_id ? 'selected' : '' }}>
@@ -65,9 +65,9 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="number" name="locations[{{ $location->product_id }}][{{ $key }}][quantity]" value="{{ $location->quantity }}" class="form-control" {{ $outboundRequest->status != 'Packing & Shipping' ? 'readonly' : '' }} required>
+                                                    <input type="number" name="locations[{{ $location->product_id }}][{{ $key }}][quantity]" value="{{ $location->quantity }}" class="form-control" {{ $outboundRequest->status != 'Requested' ? 'readonly' : '' }} required>
                                                 </td>
-                                                @if ($outboundRequest->status == 'Packing & Shipping')
+                                                @if ($outboundRequest->status == 'Requested')
                                                     <td>
                                                         <button type="button" class="btn btn-danger remove-location">Remove</button>
                                                     </td>
@@ -81,7 +81,7 @@
 									@endif
 								</tbody>
 							</table>
-                            @if ($outboundRequest->status == 'Packing & Shipping')
+                            @if ($outboundRequest->status == 'Requested')
 							    <button type="button" class="btn btn-secondary add-location" data-product-id="{{ $productId }}">Add Location</button>
                             @endif
                         </td>
@@ -96,6 +96,7 @@
             <textarea name="notes" class="form-control" placeholder="Optional notes">{{ $outboundRequest->notes }}</textarea>
         </div>
 
+        @if ($outboundRequest->status != 'Requested' && $outboundRequest->status != 'Pending Confirmation')
 			<h3>Expedition Details</h3>
 			<div class="form-group">
 				<label for="expedition_id">Expedition</label>
@@ -127,6 +128,7 @@
                 <label for="real_shipping_fee">Real Shipping Fee</label>
                 <input type="number" step="0.01" name="real_shipping_fee" class="form-control" value="{{ $outboundRequest->real_shipping_fee }}" {{ $outboundRequest->status != 'Packing & Shipping' ? 'readonly' : '' }}>
             </div>
+        @endif
 
 		<!-- Status Display -->
 		<h3>Status Display</h3>
@@ -143,7 +145,7 @@
         <h3>Actions</h3>
         @switch($outboundRequest->status)
             @case('Requested')
-                <a href="{{ route('outbound_requests.checkStock', $outboundRequest->id) }}" class="btn btn-primary">Verify Stock & Approve</a>
+                <button name="submit" type="submit" class="btn btn-success" value="Verify Stock & Approve">Verify Stock & Approve</button>
                 <button name="submit" type="submit" class="btn btn-danger" value="Reject Request">Reject Request</button>
                 @break
 
@@ -155,14 +157,11 @@
                 @break
 
             @case('In Transit')
+                <h4>Waiting Sales Confirmation about Received Quantities by Customer before Complain or Ready to Complete</h4>
                 @break
 
             @case('Customer Complaint')
                 <button name='submit' type="submit" class="btn btn-warning" value="Resolve Quantity Problem">Resolve Quantity Problem</button>
-                @break
-
-            @case('Ready to Complete')
-                <a href="{{ route('outbound_requests.complete', $outboundRequest->id) }}" class="btn btn-primary">Complete Request</a>
                 @break
         @endswitch
 
@@ -194,17 +193,21 @@
                 const tbody = document.getElementById(`locations-${productId}`);
                 const rowCount = tbody.querySelectorAll('tr').length;
 
+                var select = [];
+                @foreach ($availableLocations as $productId => $locations)  
+                select[{{$productId}}] = '';
+                    @foreach ($locations as $location) 
+                select[{{$productId}}] += `<option value="{{ $location->id }}">Room: {{ $location->room }}, Rack: {{ $location->rack }} (Available: {{ $location->quantity }})</option>`;
+                    @endforeach
+                @endforeach
+
                 // Add a new row
                 const newRow = `
                     <tr>
                         <td>
                             <select name="locations[${productId}][${rowCount}][location_id]" class="form-control location-select">
                                 <option value="" selected>Select a location</option>
-                                @foreach ($availableLocations[$productId] as $location)
-                                    <option value="{{ $location->id }}">
-                                        Room: {{ $location->room }}, Rack: {{ $location->rack }} (Available: {{ $location->quantity }})
-                                    </option>
-                                @endforeach
+                                ` + select[productId] + `
                             </select>
                         </td>
                         <td>

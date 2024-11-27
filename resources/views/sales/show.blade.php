@@ -49,6 +49,7 @@
 
     <div class="mb-4">
         <h3>Complaint Details</h3>
+        <a href="{{ route('customer_complaints.create', ['sales_order_id' => $sale->id]) }}" class="btn btn-danger">Create Complaint</a>
         <p>{{ $sale->complaint_details ?? 'No complaints reported.' }}</p>
     </div>
 

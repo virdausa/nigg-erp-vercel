@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerComplaintController;
 
 Route::resource('products', ProductController::class);
 
@@ -21,6 +22,8 @@ Route::post('/purchases/{id}/update-status', [PurchaseController::class, 'update
 Route::resource('sales', SalesController::class);
 Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
 Route::put('sales/{sale}', [SalesController::class, 'update'])->name('sales.update');
+Route::resource('customer_complaints', CustomerComplaintController::class);
+Route::put('customer_complaints/{customer_complaint}/resolve', [CustomerComplaintController::class, 'resolve'])->name('customer_complaints.resolve');
 
 
 Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
@@ -51,6 +54,7 @@ Route::resource('outbound_requests', OutboundRequestController::class);
 Route::get('/outbound_requests/{outboundRequest}/check-stock', [OutboundRequestController::class, 'checkStockAvailability'])->name('outbound_requests.checkStock');
 Route::get('/outbound_requests/{outboundRequest}/reject', [OutboundRequestController::class, 'rejectRequest'])->name('outbound_requests.reject');
 Route::get('/outbound_requests/{id}/complete', [OutboundRequestController::class, 'complete'])->name('outbound_requests.complete');
+Route::put('/outbound_requests/{id}/verifyCompletion', [OutboundRequestController::class, 'verifyCompletion'])->name('outbound_requests.verifyCompletion');
 
 
 Route::resource('suppliers', SupplierController::class);

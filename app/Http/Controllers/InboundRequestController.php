@@ -258,7 +258,6 @@ class InboundRequestController extends Controller
 			]);
 			
 			
-			// Check if the product already exists in the inventory for the specified warehouse
 			// Check if the product already exists in the inventory for the specified warehouse and location
 			$inventory = Inventory::where('product_id', $productId)
 								  ->where('warehouse_id', $inboundRequest->warehouse_id)

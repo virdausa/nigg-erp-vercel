@@ -16,6 +16,8 @@ class Inventory extends Model
         'warehouse_id',
 		'location_id',
         'quantity',
+        'reserved_quantity',
+        'in_transit_quantity',
     ];
 
     // Relationship with Product

@@ -79,7 +79,7 @@
         </div>
         <div class="form-group">
             <label for="estimated_shipping_fee">Estimated Shipping Fee</label>
-            <input type="number" name="estimated_shipping_fee" class="form-control" value="{{ $sale->estimated_shipping_fee }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
+            <input type="number" name="estimated_shipping_fee" class="form-control" value="{{ $sale->estimated_shipping_fee ?? 0 }}" required {{ $sale->status != 'Planned' ? 'readonly' : '' }}>
         </div>
 
         <h3>Complaint Details (if any)</h3>
@@ -95,43 +95,45 @@
             <input type="text" class="form-control" name="status" value="{{ $sale->status }}" readonly>
         </div>
 
-        @if (count($outboundRequests) > 0)
-            @foreach($outboundRequests as $outboundRequest)
-                <div class="form-group">
-                    <label for="status_outbound">Outbound Status</label>
-                    <input type="text" class="form-control" value="{{ $outboundRequest->status }}" readonly>
-                </div>
+        @if ($sale->status != 'Planned' && $sale->status != 'Unpaid')
+            @if (count($outboundRequests) > 0)
+                @foreach($outboundRequests as $outboundRequest)
+                    <div class="form-group">
+                        <label for="status_outbound">Outbound Status</label>
+                        <input type="text" class="form-control" value="{{ $outboundRequest->status }}" readonly>
+                    </div>
 
-                <!-- Customer Received Quantities Section -->
-                <h3>Customer Received Quantities</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Shipped Quantity</th>
-                            <th>Received Quantity</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($outboundRequest->requested_quantities as $productId => $quantity)
+                    <!-- Customer Received Quantities Section -->
+                    <h3>Customer Received Quantities</h3>
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>{{ $outboundRequest->sales->products->find($productId)->name }}</td>
-                                <td>{{ $quantity }}</td>
-                                <td>
-                                    <input type="number" name="received_quantities[{{ $outboundRequest->id }}][{{ $productId }}]" 
-                                        value="{{ $outboundRequest->received_quantities[$productId] ?? $quantity }}" 
-                                        class="form-control" min="0" {{ $outboundRequest->status != 'In Transit' ? 'readonly' : '' }}>
-                                </td>
+                                <th>Product</th>
+                                <th>Shipped Quantity</th>
+                                <th>Received Quantity</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                @if ($outboundRequest->status == 'In Transit')
-                    <button type="submit" class="btn btn-primary" value="Update Received Quantities">Update Received Quantities</button>
-                @endif
-            @endforeach
-        @endif
-		
+                        </thead>
+                        <tbody>
+                            @foreach ($outboundRequest->requested_quantities as $productId => $quantity)
+                                <tr>
+                                    <td>{{ $outboundRequest->sales->products->find($productId)->name }}</td>
+                                    <td>{{ $quantity }}</td>
+                                    <td>
+                                        <input type="number" name="received_quantities[{{ $outboundRequest->id }}][{{ $productId }}]" 
+                                            value="{{ $outboundRequest->received_quantities[$productId] ?? 0 }}" 
+                                            class="form-control" min="0" {{ $outboundRequest->status != 'In Transit' ? 'readonly' : '' }}>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @if ($outboundRequest->status == 'In Transit')
+                        <button name="submit" type="submit" class="btn btn-primary" value="Update Received Quantities">Update Received Quantities</button>
+                    @endif
+                @endforeach
+            @endif
+		@endif
+
         <!-- Action Buttons -->
         <h3>Actions</h3>
         <div class="mt-3">

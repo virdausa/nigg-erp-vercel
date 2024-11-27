@@ -3,6 +3,7 @@
 @section('content')
     <h1>Sales Orders</h1>
     <a href="{{ route('sales.create') }}" class="btn btn-primary mb-3">Add New Sale</a>
+	<a href="{{ route('customer_complaints.index') }}" class="btn btn-secondary mb-3">Customer Complaint</a>
 
 	<form method="GET" action="{{ route('sales.index') }}">
 		<select name="status" class="form-control mb-3">

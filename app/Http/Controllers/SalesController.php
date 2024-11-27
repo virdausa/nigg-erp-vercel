@@ -9,6 +9,7 @@ use App\Models\Warehouse;
 use App\Models\Expedition;
 use App\Models\OutboundRequest;
 use App\Models\Customer;
+use App\Models\CustomerComplaint;
 use Illuminate\Http\Request;
 
 class SalesController extends Controller
@@ -109,8 +110,6 @@ class SalesController extends Controller
 			'products.*.note' => 'nullable|string', // Handle product notes
 			'expedition_id' => 'required|exists:expeditions,id', // Validate expedition
 			'estimated_shipping_fee' => 'nullable|numeric|min:0',
-			'received_quantities' => 'required|array',
-	        'received_quantities.*.*' => 'nullable|integer|min:0',
 		]);
 
 		$sale = Sale::findOrFail($id);
@@ -139,8 +138,12 @@ class SalesController extends Controller
 		});
 		$sale->update(['total_amount' => $totalAmount]);
 
-		if($sale->status == 'In Transit') {
-			
+		if($sale->status == 'In Transit' || $sale->status == 'Customer Complaint') {
+			$validated += $request->validate([
+				'received_quantities' => 'required|array',
+				'received_quantities.*.*' => 'nullable|integer|min:0',
+			]);
+
 			// Update received quantities
 			$receivedQuantities = $validated['received_quantities'];
 			$receivedQuantitiesSales = [];
@@ -157,7 +160,7 @@ class SalesController extends Controller
 				
 				$outboundRequest->update(['received_quantities' => $receivedQuantitiesEachOuboundRequest]);
 
-				if($outboundRequest->status = 'In Transit'){
+				if($outboundRequest->status == 'In Transit' && $request['submit'] == 'Update Received Quantities'){
 					if($outboundRequest->received_quantities == $outboundRequest->requested_quantities) {
 						$outboundRequest->update(['status' => 'Ready to Complete']);
 					} else {
@@ -170,16 +173,21 @@ class SalesController extends Controller
 
 			// check whether all received quantities are correct
 			$allReceivedCorrectly = true;
-			foreach(collect($sale->requested_quantities) as $productId => $requestedQuantity) {
-				if($receivedQuantitiesSales[$productId] != $requestedQuantity) {
+			$salesRequestedQuantities = SalesProduct::where('sale_id', $sale->id)->get();
+			foreach($salesRequestedQuantities as $requestedQuantity) {
+				$productId = $requestedQuantity->product_id;
+
+				if($receivedQuantitiesSales[$productId] != $requestedQuantity->quantity) {
 					$allReceivedCorrectly = false;
 				}
 			}
 
-			if($allReceivedCorrectly){
-				$sale->update(['status' => 'Completed']);
-			} else {
-				$sale->update(['status' => 'Customer Complaint']);
+			if($request['submit'] == 'Update Received Quantities'){
+				if($allReceivedCorrectly){
+					$sale->update(['status' => 'Completed']);
+				} else {
+					$sale->update(['status' => 'Customer Complaint']);
+				}
 			}
 		}
 		

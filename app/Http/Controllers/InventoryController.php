@@ -17,20 +17,8 @@ class InventoryController extends Controller
 {
 	public function index(Request $request)
 	{
-		$query = Inventory::with(['product', 'warehouse']);
-
-		// Apply search filter
-		if ($request->has('search')) {
-			$search = $request->input('search');
-			$query->whereHas('product', function ($q) use ($search) {
-				$q->where('name', 'LIKE', "%{$search}%");
-			})->orWhereHas('warehouse', function ($q) use ($search) {
-				$q->where('name', 'LIKE', "%{$search}%");
-			});
-		}
-
-		$inventories = $query->get();
-
+		$inventories = Inventory::with(['product', 'warehouse'])->get();
+		
 		// Fetch inventory details grouped by location
 		$inventoryByLocations = InventoryHistory::with(['product', 'warehouse', 'location'])
 			->select('product_id', 'warehouse_id', 'location_id', DB::raw('SUM(quantity) as total_quantity'))
@@ -68,17 +56,23 @@ class InventoryController extends Controller
 			'rack' => 'required|string', // Validate rack
 			'notes' => 'nullable|string'
 		]);
-
+		
 		$productId = $request->input('product_id');
 		$warehouseId = $request->input('warehouse_id');
 		$quantity = $request->input('quantity');
 		$transactionType = $request->input('transaction_type');
+		
+		$location = Location::where('warehouse_id', $warehouseId)
+								->where('room', $request->room)
+								->where('rack', $request->rack)
+								->first();
 
 		// Fetch or create the inventory entry for the product in the warehouse
 		$inventory = Inventory::firstOrCreate(
 			[
 				'product_id' => $productId,
-				'warehouse_id' => $warehouseId
+				'warehouse_id' => $warehouseId,
+				'location_id' => $location->id,
 			],
 			['quantity' => 0]
 		);
@@ -94,11 +88,6 @@ class InventoryController extends Controller
 		}
 
 		$inventory->save();
-
-		$location = Location::where('warehouse_id', $warehouseId)
-								->where('room', $request->room)
-								->where('rack', $request->rack)
-								->first();
 		
 		// Record transaction in inventory history
 		InventoryHistory::create([
