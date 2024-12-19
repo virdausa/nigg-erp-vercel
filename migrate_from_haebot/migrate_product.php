@@ -16,7 +16,7 @@ if ($destination_conn->connect_error) {
 }
 
 // Query untuk mendapatkan data dari database asal
-$source_query = "SELECT PRODUCT_NO, PRODUCT_NAME, PRICE_BASE FROM products";
+$source_query = "SELECT PRODUCT_NO, PRODUCT_NAME, PRICE_BASE, PRODUCT_SKU, PRODUCT_WEIGHT, STATE_MARKETING, PRODUCT_NOTE FROM products";
 $source_result = $source_conn->query($source_query);
 
 if ($source_result->num_rows > 0) {
@@ -25,14 +25,18 @@ if ($source_result->num_rows > 0) {
         $id = $row['PRODUCT_NO'];
         $name = $row['PRODUCT_NAME'];
         $price = $row['PRICE_BASE'];
+        $sku = $row['PRODUCT_SKU'];
+        $weight = $row['PRODUCT_WEIGHT'];
+        $status = $row['STATE_MARKETING'];
+        $notes = $row['PRODUCT_NOTE'];
 
         // Query untuk memasukkan data ke database tujuan
         $destination_query = $destination_conn->prepare(
-            "INSERT INTO products (id, name, price) VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE name = VALUES(name), price = VALUES(price)"
+            "INSERT INTO products (id, name, price, sku, weight, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE name = VALUES(name), price = VALUES(price), sku = VALUES(sku), weight = VALUES(weight), status = VALUES(status), notes = VALUES(notes)"
         );
 
-        $destination_query->bind_param("isd", $id, $name, $price);
+        $destination_query->bind_param("isdsdss", $id, $name, $price, $sku, $weight, $status, $notes);
 
         if ($destination_query->execute()) {
             echo "Data produk dengan ID $id berhasil dipindahkan. <br>";
