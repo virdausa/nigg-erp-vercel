@@ -20,6 +20,7 @@
                                 <x-th>Phone Number</x-th>
                                 <x-th>Address</x-th>
                                 <x-th>Status</x-th>
+                                <x-th>Reg Date</x-th>
                                 <x-th>Actions</x-th>
                             </tr>
                         </x-thead>
@@ -32,6 +33,7 @@
                                 <x-td>{{ $customer->phone_number }}</x-td>
                                 <x-td>{{ $customer->address }}</x-td>
                                 <x-td>{{ $customer->status }}</x-td>
+                                <x-td>{{ $customer->created_at }}</x-td>
                                 <x-td class="flex justify-center items-center gap-2">
                                     <a href="{{ route('customers.edit', $customer->id) }}">
                                         <x-button type="button" variant="primary">
