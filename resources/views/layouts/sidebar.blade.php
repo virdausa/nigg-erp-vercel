@@ -11,7 +11,7 @@
             </svg>
          </button>
         <a href="https://flowbite.com" class="flex ms-2 md:me-24">
-          <img src="{{ asset('svg/haebot.svg') }}" class="h-8 me-3" alt="FlowBite Logo" />
+          <img src="{{ asset('svg/haebot.svg') }}" class="h-8 me-3 dark:invert" alt="FlowBite Logo" />
           <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">HaeBot</span>
         </a>
       </div>
@@ -23,7 +23,7 @@
                 <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="user photo">
               </button>
             </div>
-            <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
+            <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow-2xl dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
               <div class="px-4 py-3" role="none">
                 <p class="text-sm text-gray-900 dark:text-white" role="none">
                 {{ Auth::user()->name }}
@@ -42,7 +42,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
-                    <x-responsive-nav-link :href="route('logout')"
+                    <x-responsive-nav-link-danger :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
