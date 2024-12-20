@@ -1,3 +1,3 @@
-<thead {{ $attributes->merge(['class' => 'text-xs text-secondary-foreground uppercase bg-secondary']) }}>
+<thead {{ $attributes->merge(['class' => 'text-xs text-gray-200 uppercase bg-gray-700']) }}>
     {{ $slot }}
 </thead>
