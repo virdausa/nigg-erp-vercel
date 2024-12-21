@@ -12,10 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->string('nama')->after('id');
-            $table->string('sku')->after('nama');
-            $table->integer('berat')->after('price');
-            $table->enum('status', ['active', 'non-active'])->after('berat');
+            $table->string('sku')->after('name');
+            $table->integer('weight')->after('price');
+            $table->enum('status', ['active', 'non-active'])->after('weight');
             $table->text('note')->nullable()->after('status');
         });
     }
@@ -26,9 +25,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('nama');
+            $table->dropColumn('name');
             $table->dropColumn('sku');
-            $table->dropColumn('berat');
+            $table->dropColumn('weight');
             $table->dropColumn('status');
             $table->dropColumn('note');
         });
