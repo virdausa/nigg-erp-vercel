@@ -16,7 +16,7 @@ class Product extends Model
 		'sku',
 		'weight',
 		'price',
-		'note'
+		'notes'
 	];
 
 	public function purchases()
