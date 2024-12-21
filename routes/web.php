@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,5 +20,6 @@ Route::middleware('auth')->group(function () {
 });
 
 route::resource("customers", CustomerController::class);
+route::resource("products", ProductController::class);
 
 require __DIR__ . '/auth.php';
