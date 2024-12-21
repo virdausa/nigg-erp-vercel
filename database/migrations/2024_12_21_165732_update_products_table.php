@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('sku')->after('name');
             $table->integer('weight')->after('price');
             $table->enum('status', ['active', 'non-active'])->after('weight');
-            $table->text('note')->nullable()->after('status');
+            $table->text('notes')->nullable()->after('status');
         });
     }
 
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->dropColumn('sku');
             $table->dropColumn('weight');
             $table->dropColumn('status');
-            $table->dropColumn('note');
+            $table->dropColumn('notes');
         });
     }
 };
