@@ -10,31 +10,31 @@
                         @csrf
                         <div class="flex flex-col gap-6">
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Customer Name</label>
-                                <x-input type="text" name="name" required x-model="name" />
+                                <x-input-label for="name">Customer Name</x-input-label>
+                                <x-input-input type="text" name="name" required x-model="name" />
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Email</label>
-                                <x-input type="email" name="email" x-model="email" />
+                                <x-input-label for="email">Email</x-input-label>
+                                <x-input-input type="email" name="email" x-model="email" />
                             </div>
                             <div>
-                                <label for="phone_number" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Phone Number</label>
-                                <x-input type="text" name="phone_number" required x-model="phone_number" />
+                                <x-input-label for="phone_number">Phone Number</x-input-label>
+                                <x-input-input type="text" name="phone_number" required x-model="phone_number" />
                             </div>
                             <div>
-                                <label for="address" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Address</label>
-                                <x-input name="address" x-model="address" />
+                                <x-input-label for="address">Address</x-input-label>
+                                <x-input-input name="address" x-model="address" />
                             </div>
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Status</label>
-                                <select name="status" x-model="status" class='flex h-9 w-full rounded-md border border-gray-900 dark:border-gray-100 bg-transparent px-3 py-1 text-gray-900 dark:text-gray-100 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
+                                <x-input-label for="status">Status</x-input-label>
+                                <x-input-select name="status" x-model="status">
+                                    <x-select-option value="Active">Active</x-select-option>
+                                    <x-select-option value="Inactive">Inactive</x-select-option>
+                                </x-input-select>
                             </div>
                             <div>
-                                <label for="notes" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Note</label>
-                                <textarea class='flex h-9 w-full rounded-md border border-gray-900 dark:border-gray-100 bg-transparent px-3 py-1 text-gray-900 dark:text-gray-100 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm' name="notes" x-model="notes"></textarea>
+                                <x-input-label for="notes">Note</x-input-label>
+                                <x-input-textarea name="notes" x-model="notes"></x-input-textarea>
                             </div>
                             <div class="flex gap-3 justify-end">
                                 <a href="{{ route('customers.index') }}">

@@ -11,31 +11,35 @@
                         @method('PUT')
                         <div class="flex flex-col gap-6">
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Customer Name</label>
-                                <x-input type="text" name="name" x-model="name" required value="{{ $customer->name }}" />
+                                <x-input-label for="name" :value="__('Customer Name')" />
+                                <x-input-input type="text" name="name" x-model="name" required
+                                    value="{{ $customer->name }}" />
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Email</label>
-                                <x-input type="email" name="email" x-model="email" value="{{ $customer->email }}" required />
+                                <x-input-label for="email" :value="__('Email')" />
+                                <x-input-input type="email" name="email" x-model="email"
+                                    value="{{ $customer->email }}" required />
                             </div>
                             <div>
-                                <label for="phone_number" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Phone Number</label>
-                                <x-input type="text" name="phone_number" x-model="phone_number" value="{{ $customer->phone_number }}" required />
+                                <x-input-label for="phone_number" :value="__('Phone Number')" />
+                                <x-input-input type="text" name="phone_number" x-model="phone_number"
+                                    value="{{ $customer->phone_number }}" required />
                             </div>
                             <div>
-                                <label for="address" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Address</label>
-                                <x-input name="address" x-model="address" value="{{ $customer->address }}" />
+                                <x-input-label for="address" :value="__('Address')" />
+                                <x-input-input name="address" x-model="address" value="{{ $customer->address }}" />
                             </div>
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Status</label>
-                                <select name="status" x-model="status" required class='flex h-9 w-full rounded-md border border-gray-900 dark:border-gray-100 bg-transparent px-3 py-1 text-gray-800 dark:text-gray-200 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'>
-                                    <option value="Active" {{ $customer->status == 'Active' ? 'selected' : '' }}>Active</option>
-                                    <option value="Inactive" {{ $customer->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
-                                </select>
+                                <x-input-label for="status" :value="__('Status')" />
+                                <x-input-select name="status" x-model="status" required>
+                                    <x-select-option value="Active" :selected="$customer->status === 'Active'">Active</x-select-option>
+                                    <x-select-option value="Inactive" :selected="$customer->status === 'Inactive'">Inactive</x-select-option>
+                                </x-input-select>
                             </div>
                             <div>
-                                <label for="notes" class="block text-sm font-medium text-gray-900 dark:text-gray-100">Notes</label>
-                                <textarea name="notes" x-model="notes" class='flex h-9 w-full rounded-md border border-gray-900 dark:border-gray-100 bg-transparent px-3 py-1 text-gray-800 dark:text-gray-200 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'>{{ $customer->notes }}</textarea>
+                                <x-input-label for="notes" :value="__('Notes')" />
+                                <x-input-textarea name="notes"
+                                    x-model="notes">{{ $customer->notes }}</x-input-textarea>
                             </div>
                         </div>
                         <div class="flex gap-3 justify-end mt-4">
