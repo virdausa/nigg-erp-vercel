@@ -11,7 +11,6 @@ class Product extends Model
 
 	// Allow mass assignment for these fields
 	protected $fillable = [
-		'id',
 		'name',
 		'sku',
 		'weight',
