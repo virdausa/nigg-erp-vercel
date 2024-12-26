@@ -1,57 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title')</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-			<div class="container">
-				<a class="navbar-brand" href="{{ route('dashboard') }}">Dashboard</a>
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarNav">
-					<ul class="navbar-nav">
-						<li class="nav-item">
-							<a class="nav-link" href="{{ route('purchases.index') }}">Purchases</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{{ route('suppliers.index') }}">Suppliers</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{{ route('customers.index') }}">Customers</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{{ route('products.index') }}">Products</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{{ route('warehouses.index') }}">Warehouses</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{{ route('inventory.index') }}">Inventory</a>
-						</li>
-						<li>
-							<a class="nav-link" href="{{ route('sales.index') }}">Sales</a>
-						</li>
-						<li>
-							<a class="nav-link" href="{{ route('inbound_requests.index') }}">Inbound Requests</a>
-						</li>
-						<li>
-							<a class="nav-link" href="{{ route('outbound_requests.index') }}">Outbound Requests</a>
-						</li>
-					</ul>
-				</div>
-			</div>
-		</nav>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
 
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        @yield('content')
-    </div>
-</body>
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+        <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"  rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased bg-white dark:bg-gray-900">
+    
+        @include('layouts.sidebar')
+            <!-- Page Content -->
+   
+            <main class="p-4 sm:ml-64">
+                {{ $slot }}
+            </main>
+            
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+
+    </body>
 </html>
-

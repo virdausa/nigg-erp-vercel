@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,6 +19,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'tgl_lahir',  // Add the 'tgl_lahir' attribute
+        'alamat',     // Add the 'alamat' attribute
+        'no_hp',      // Add the 'no_hp' attribute
+        'role',       // Add the 'role' attribute
+        'tgl_keluar', // Add the 'tgl_keluar' attribute
     ];
 
     /**
@@ -43,6 +46,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'tgl_lahir' => 'date',    // Ensure 'tgl_lahir' is cast to a date
+            'tgl_keluar' => 'date',   // Ensure 'tgl_keluar' is cast to a date
         ];
     }
 }

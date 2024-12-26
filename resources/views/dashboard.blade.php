@@ -1,32 +1,17 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Dashboard') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Dashboard')
-
-@section('content')
-    <h1>Dashboard</h1>
-    <p>Welcome to your business management app. Use the links below to navigate to different sections:</p>
-
-    <ul class="list-group">
-        <li class="list-group-item">
-            <a href="{{ route('purchases.index') }}">Manage Purchases</a>
-        </li>
-        <li class="list-group-item">
-            <a href="{{ route('suppliers.index') }}">Manage Suppliers</a>
-        </li>
-        <li class="list-group-item">
-            <a href="{{ route('customers.index') }}">Manage Customers</a>
-        </li>
-        <li class="list-group-item">
-            <a href="{{ route('products.index') }}">Manage Products</a>
-        </li>
-        <li class="list-group-item">
-            <a href="{{ route('warehouses.index') }}">Manage Warehouses</a>
-        </li>
-        <li class="list-group-item">
-            <a href="{{ route('inventory.index') }}">Manage Inventory</a>
-        </li>
-		<li class="list-group-item">
-            <a href="{{ route('sales.index') }}">Manage Sales</a>
-        </li>
-    </ul>
-@endsection
+    <div class="py-16 ">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white bg-white border-b border-gray-500 dark:bg-gray-800 dark:border-gray-700 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-white">
+                    {{ __("You're logged in!") }}
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

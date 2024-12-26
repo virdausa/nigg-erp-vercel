@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -23,41 +25,93 @@ class ProductController extends Controller
     // Store the new product in the database
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-        ]);
+        try {
+            // Validate the request
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'sku' => 'required|string|max:255',
+                'price' => 'required|numeric|min:0',
+                'weight' => 'required|numeric|min:0',
+                'status' => 'required|in:Active,Inactive',
+                'notes' => 'nullable|string',
+            ]);
 
-        Product::create([
-            'name' => $request->name,
-            'price' => $request->price,
-        ]);
+            // Create the product
+            $product = Product::create([
+                'name' => $request->name,
+                'sku' => $request->sku,
+                'price' => $request->price,
+                'weight' => $request->weight,
+                'status' => $request->status,
+                'notes' => $request->notes,
+            ]);
+            return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'inputs' => $request->all(),
+            ]);
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+            // Re-throw the exception for the default Laravel error handling
+            throw $e;
+        } catch (\Exception $e) {
+            // Log unexpected errors
+            Log::error('Unexpected error occurred', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('products.index')->with('error', 'An unexpected error occurred.');
+        }
     }
-	
-	public function edit(Product $product)
-	{
-		return view('products.edit', compact('product'));
-	}
 
-	public function update(Request $request, Product $product)
-	{
-		$request->validate([
-			'name' => 'required|string|max:255',
-			'price' => 'required|numeric|min:0',
-		]);
+    public function edit(Product $product)
+    {
+        return view('products.edit', compact('product'));
+    }
 
-		$product->update($request->all());
+    public function update(Request $request, Product $product)
+    {
+        try {
+            // Validate the request
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'sku' => 'required|string|max:255',
+                'price' => 'required|numeric|min:0',
+                'weight' => 'required:numeric|min:0',
+                'status' => 'required|in:Active,Inactive',
+                'notes' => 'nullable|string',
+            ]);
 
-		return redirect()->route('products.index')->with('success', 'Product updated successfully.');
-	}
+            // Update the product
+            $product->update($request->all());
 
-	public function destroy(Product $product)
-	{
-		$product->delete();
+            return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+        } catch (ValidationException $e) {
+            // Log validation errors
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'inputs' => $request->all(),
+            ]);
 
-		return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
-	}
+            // Re-throw the exception for the default Laravel error handling
+            throw $e;
+        } catch (\Exception $e) {
+            // Log unexpected errors
+            Log::error('Unexpected error occurred', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
+            return redirect()->route('products.index')->with('error', 'An unexpected error occurred.');
+        }
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+    }
 }
