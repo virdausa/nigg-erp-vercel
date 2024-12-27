@@ -19,11 +19,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'tgl_lahir',  // Add the 'tgl_lahir' attribute
-        'alamat',     // Add the 'alamat' attribute
-        'no_hp',      // Add the 'no_hp' attribute
-        'role',       // Add the 'role' attribute
-        'tgl_keluar', // Add the 'tgl_keluar' attribute
+        'tgl_lahir',  
+        'alamat',    
+        'no_hp',     
+        'role',      
+        'tgl_keluar', 
     ];
 
     /**

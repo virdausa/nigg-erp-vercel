@@ -58,6 +58,8 @@
         });
     </script>
 @endif
+<script src="{{ asset('js/phoneFormatter.js') }}"></script>
+
 </body>
 
 </html>
