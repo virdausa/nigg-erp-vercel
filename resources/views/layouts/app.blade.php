@@ -12,18 +12,16 @@
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
-    <!-- <script src="sweetalert2.min.js"></script>
-        <link rel="stylesheet" href="sweetalert2.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="sweetalert2.min.css">
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-white dark:bg-gray-900">
+<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
 
     @include('layouts.sidebar')
-    <!-- @include('components.alert') -->
-
-
     <!-- Page Content -->
 
     <main class="p-4 sm:ml-64">
@@ -33,6 +31,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
 
 
     @stack('script')
@@ -101,6 +100,11 @@
         </script>
     @endif
     <script src="{{ asset('js/phoneFormatter.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.print.min.js"></script>
 </body>
 
 </html>

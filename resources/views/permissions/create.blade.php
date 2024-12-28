@@ -14,11 +14,11 @@
                     <form action="{{ route('permissions.store') }}" method="POST" class="mt-4">
                         @csrf
                         <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Nama Permission</label>
-                            <input type="text" name="name" id="name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+                            <x-input-label for="name" >Nama Permission</x-input-label>
+                            <x-text-input type="text" name="name" id="name" class="mt-1 block w-full" required></x-text-input>
                         </div>
 
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Simpan</button>
+                        <x-primary-button>Simpan</x-primary-button>
                     </form>
                 </div>
             </div>

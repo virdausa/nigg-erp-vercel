@@ -7,19 +7,19 @@
 
     <div class="py-16">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white border-b border-gray-500 dark:bg-gray-800 dark:border-gray-700 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white bg-white dark:bg-gray-800 dark:border-gray-700 overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-white">
-                    <h3 class="text-lg font-medium leading-tight">Edit Permission: {{ $permission->name }}</h3>
-
+                    <h3 class="text-lg fdark:text-white font-bold">Edit Permission</h3>
+                    <p class="text-sm dark:text-gray-200 mb-4">{{ $permission->name }}</p>
                     <form action="{{ route('permissions.update', $permission->id) }}" method="POST" class="mt-4">
                         @csrf
                         @method('PUT')
                         <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Nama Permission</label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $permission->name) }}" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+                            <x-input-label for="name" class="block">Nama Permission</x-input-label>
+                            <x-text-input type="text" name="name" id="name" value="{{ old('name', $permission->name) }}" class="mt-1 block w-full px-4 py-2" required></x-text-input>
                         </div>
 
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Update</button>
+                        <x-primary-button>Update</x-primary-button>
                     </form>
                 </div>
             </div>

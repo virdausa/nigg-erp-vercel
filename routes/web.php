@@ -25,6 +25,9 @@ route::resource("customers", CustomerController::class);
 route::resource("products", ProductController::class);
 
 Route::resource('roles', RoleController::class);
+Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+Route::get('/roles/data', [RoleController::class, 'getRolesData'])->name('roles.data');
+
 Route::resource('permissions', PermissionController::class);
 
 require __DIR__ . '/auth.php';

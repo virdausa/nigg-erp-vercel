@@ -7,27 +7,36 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-bold mb-4">Tambah Role Baru</h3>
+            <div class="bg-white bg-white dark:bg-gray-800 dark:border-gray-700 overflow-hidden shadow-lg sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-white">
+                <h3 class="text-lg dark:text-white font-bold">Tambah Role Access</h3>
+                <p class="text-sm dark:text-gray-200 mb-4">Atur role dan permission setiap fitur</p>
 
                     <form action="{{ route('roles.store') }}" method="POST">
                         @csrf
                         <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Nama Role</label>
-                            <input type="text" name="name" id="name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+                            <x-input-label for="name" class="block">Nama Role</x-input-label>
+                            <x-text-input type="text" name="name" id="name" class="mt-1 block w-full px-4 py-2" required placeholder="Tambah Role"></x-text-input>
                         </div>
 
                         <div class="mb-4">
-                            <label for="permissions" class="block text-sm font-medium text-gray-700">Permissions</label>
-                            <select name="permissions[]" id="permissions" class="mt-1 block w-full border-gray-300 rounded-md" multiple>
-                                @foreach ($permissions as $permission)
-                                    <option value="{{ $permission->id }}">{{ $permission->name }}</option>
-                                @endforeach
-                            </select>
+                            <h4 class="text-md font-semibold dark:text-gray-200 mb-3">Permissions</h4>
+                            @foreach ($groupedPermissions as $group => $permissions)
+                                <div class="mb-4 p-2 py-3 bg-gray-200 dark:text-gray-200 dark:bg-gray-900 rounded rounded-md shadow-md">
+                                    <h5 class="text-md font-bold text-gray-600 dark:text-gray-300 uppercase font-bold">{{ $group }}</h5>
+                                    <div class="grid grid-cols-2 gap-2 mt-2">
+                                        @foreach ($permissions as $permission)
+                                            <label class="flex items-center space-x-2">
+                                                <input type="checkbox" name="permissions[]" value="{{ $permission->id }}" class="form-checkbox text-blue-500 rounded">
+                                                <span>{{ $permission->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
 
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Simpan</button>
+                        <x-primary-button>Simpan</x-primary-button>
                     </form>
                 </div>
             </div>
