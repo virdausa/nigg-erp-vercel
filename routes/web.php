@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,5 +23,8 @@ Route::middleware('auth')->group(function () {
 
 route::resource("customers", CustomerController::class);
 route::resource("products", ProductController::class);
+
+Route::resource('roles', RoleController::class);
+Route::resource('permissions', PermissionController::class);
 
 require __DIR__ . '/auth.php';
