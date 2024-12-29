@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\CustomerComplaintController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\EmployeeController;
@@ -23,7 +25,21 @@ Route::middleware('auth')->group(function () {
 });
 
 route::resource("customers", CustomerController::class);
+
 route::resource("products", ProductController::class);
+
+Route::resource('sales', SalesController::class);
+Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
+Route::put('sales/{sale}', [SalesController::class, 'update'])->name('sales.update');
+Route::resource('customer_complaints', CustomerComplaintController::class);
+Route::put('customer_complaints/{customer_complaint}/resolve', [CustomerComplaintController::class, 'resolve'])->name('customer_complaints.resolve');
+
+Route::resource('sales', SalesController::class);
+
+Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
+Route::put('sales/{sale}', [SalesController::class, 'update'])->name('sales.update');
+Route::resource('customer_complaints', CustomerComplaintController::class);
+Route::put('customer_complaints/{customer_complaint}/resolve', [CustomerComplaintController::class, 'resolve'])->name('customer_complaints.resolve');
 
 Route::resource('roles', RoleController::class);
 Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
