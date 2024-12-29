@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\EmployeeController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,4 +31,6 @@ Route::get('/roles/data', [RoleController::class, 'getRolesData'])->name('roles.
 
 Route::resource('permissions', PermissionController::class);
 
+
+Route::resource('employees', EmployeeController::class);
 require __DIR__ . '/auth.php';
