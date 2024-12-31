@@ -24,7 +24,7 @@
     @include('layouts.sidebar')
     <!-- Page Content -->
 
-    <main class="p-4 sm:ml-64">
+    <main class="p-4 sm:ml-64 sm:mt-12">
         {{ $slot }}
     </main>
 
