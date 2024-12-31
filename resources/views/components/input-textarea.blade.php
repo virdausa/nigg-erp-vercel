@@ -1,2 +1,20 @@
-<textarea
-    {{ $attributes->merge(['class' => 'flex h-9 w-full rounded-md border border-gray-900 dark:border-gray-100 bg-transparent px-3 py-1 text-gray-800 dark:text-gray-200 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm']) }}></textarea>
+<textarea x-data="{ value: @js($value ?? '') }" x-model="value"
+    {{ $attributes->merge(['class' => 'border-indigo-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-300']) }}>
+</textarea>
+
+<style>
+    input:-webkit-autofill {
+        background-color: #2d3748 !important;
+        /* Tailwind bg-gray-700 in hex */
+        color: white !important;
+        /* Ensures text remains visible */
+    }
+
+    /* Optional: for Firefox, it uses :-moz-autofill */
+    input:-moz-autofill {
+        background-color: #2d3748 !important;
+        /* Tailwind bg-gray-700 in hex */
+        color: white !important;
+        /* Ensures text remains visible */
+    }
+</style>

@@ -66,6 +66,12 @@ class ProductController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $product = Product::with('purchases')->findOrFail($id);
+        return view('products.show', compact('product'));
+    }
+
     public function edit(Product $product)
     {
         return view('products.edit', compact('product'));

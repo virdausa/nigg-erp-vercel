@@ -1,1 +1,1 @@
-<option {{ $attributes->merge(['class' => 'text-black']) }}>{{ $slot }}</option>
+<option {{ $attributes->merge(['class' => 'text-white']) }}>{{ $slot }}</option>
