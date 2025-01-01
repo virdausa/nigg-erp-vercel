@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-white">
-                    <h3 class="text-lg font-bold dark:text-white mb-4">Manage Products</h3>
+                    <h3 class="text-lg font-bold dark:text-white">Manage Products</h3>
                     <p class="text-sm dark:text-gray-200 mb-6">Create, edit, and manage your product listings.</p>
 
                     <div

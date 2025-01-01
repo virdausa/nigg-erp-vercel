@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\CustomerComplaintController;
@@ -25,8 +26,10 @@ Route::middleware('auth')->group(function () {
 });
 
 route::resource("customers", CustomerController::class);
+route::resource("purchases", PurchaseController::class);
 
-route::resource("products", ProductController::class);
+
+route::resource("products", controller: ProductController::class);
 
 Route::resource('sales', SalesController::class);
 Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
