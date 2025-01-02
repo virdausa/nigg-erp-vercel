@@ -1,11 +1,24 @@
-@props(['active'])
+<div x-data="{ isOpen: false }" class="relative">
+    <!-- Trigger Button -->
+    <button @click="isOpen = true" {{ $attributes->merge(['class' => 'px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-700']) }}>
+        {{ $trigger }}
+    </button>
 
-@php
-$classes = ($active ?? false)
-            ? 'inline-flex items-center px-1 pt-1 border-b-2 border-indigo-400 text-sm font-medium leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out'
-            : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out';
-@endphp
+    <!-- Modal Dialog -->
+    <div x-show="isOpen" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50" style="display: none;">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-3xl p-6">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ $title }}</h3>
+                <button @click="isOpen = false" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    &times;
+                </button>
+            </div>
 
-<a {{ $attributes->merge(['class' => $classes]) }}>
-    {{ $slot }}
-</a>
+            <!-- Modal Content -->
+            <div>
+                {{ $slot }}
+            </div>
+        </div>
+    </div>
+</div>
