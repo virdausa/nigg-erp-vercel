@@ -31,6 +31,7 @@
                             </a>
                         </div>
                     </div>
+					<div class="overflow-x-auto">
 					<x-table-table class="table table-bordered">
 						<x-table-thead class="thead-dark">
 							<tr>
@@ -46,18 +47,19 @@
 						</x-table-thead>
 						<x-table-tbody>
 							@foreach ($purchases as $purchase)
-								<tr>
+								<x-table-tr>
 									<x-table-td>{{ $purchase->id }}</x-table-td>
 									<x-table-td>{{ $purchase->supplier->name ?? '' }}</x-table-td>
 									<x-table-td>{{ $purchase->purchase_date }}</x-table-td>
 									<x-table-td>{{ $purchase->warehouse->name ?? '' }}</x-table-td>
-									<x-table-td>{{ $purchase->total_amount }}</td>
+									<x-table-td>{{ $purchase->total_amount }}</x-table-td>
 									<x-table-td>
 										@foreach ($purchase->products as $product)
 											{{ $product->name }} (x{{ $product->pivot->quantity }})<br>
 										@endforeach
 									</x-table-td>
-									<tdx-table-td>
+
+									<x-table-td>
 										@if ($purchase->status == 'Quantity Discrepancy')
 											<span class="badge badge-warning">Quantity Discrepancy</span>
 										@else
@@ -66,23 +68,26 @@
 									</x-table-td>
 
 									<x-table-td>
-									<x-button-show :route="route('purchases.show', $purchases->id)" />
-									@if ($purchase->status != 'Completed')
-										<x-button-edit :route="route('purchases.edit', $purchases->id)" />
+										<div class="flex items-center gap-3 justify-end">
+									<x-button-show :route="route('purchases.show', $purchase->id)" />
+										@if ($purchase->status != 'Completed')
+											<x-button-edit :route="route('purchases.edit', $purchase->id)" />
 
+											@endif
+											@if ($purchase->status == 'Planned')
+											<form action="{{ route('purchases.destroy', $purchase->id) }}" method="POST">
+													@csrf
+													@method('DELETE')
+													<x-button-delete :route="route('purchases.destroy', $purchase->id)" />
+												</form>
 										@endif
-										@if ($purchase->status == 'Planned')
-										<form action="{{ route('purchases.destroy', $purchases->id) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <x-button-delete :route="route('purchases.destroy', $purchases->id)" />
-                                            </form>
-										@endif
+										</div>
 									</x-table-td>
-								</tr>
+								</x-table-tr>
 							@endforeach
 						</x-table-tbody>
 					</x-table-table>
+				</div>
 				</div>
 			</div>
 		</div>
