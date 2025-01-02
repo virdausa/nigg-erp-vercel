@@ -31,7 +31,7 @@
                                     required x-model="number"></x-text-input>
                             </div>
                             <div>
-                                <x-input-label for="weight">Weight</x-input-label>
+                                <x-input-label for="weight">Weight (gram)</x-input-label>
                                 <x-text-input type="number" name="weight" id="weight" class="mt-1 block w-full"
                                     x-model="weight"></x-text-input>
                             </div>
