@@ -1,35 +1,60 @@
-{{-- resources/views/suppliers/create.blade.php --}}
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">
+            {{ __('Create New Supplier') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Create New Supplier')
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-white">
+                    <h1 class="text-2xl font-bold mb-6">Create New Supplier</h1>
 
-@section('content')
-<h1>Create New Supplier</h1>
-<form action="{{ route('suppliers.store') }}" method="POST">
-    @csrf
-    <div class="form-group">
-        <label for="name">Supplier Name</label>
-        <input type="text" name="name" class="form-control" required>
+                    <form action="{{ route('suppliers.store') }}" method="POST" class="space-y-6">
+                        @csrf
+
+                        <!-- Supplier Name -->
+                        <div class="form-group">
+                            <x-input-label for="name">Supplier Name</x-input-label>
+                            <x-text-input type="text" id="name" name="name" class="w-full" required />
+                        </div>
+
+                        <!-- Location -->
+                        <div class="form-group">
+                            <x-input-label for="location">Location</x-input-label>
+                            <x-text-input type="text" id="location" name="location" class="w-full" />
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="form-group">
+                            <x-input-label for="contact_info">Contact Info</x-input-label>
+                            <x-text-input type="text" id="contact_info" name="contact_info" class="w-full" />
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <x-input-label for="status">Status</x-input-label>
+                            <select id="status" name="status" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group">
+                            <x-input-label for="notes">Notes</x-input-label>
+                            <textarea id="notes" name="notes" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex justify-end space-x-4">
+                            <x-primary-button type="submit">Create Supplier</x-primary-button>
+                            <x-button href="{{ route('suppliers.index') }}">Cancel</x-button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="location">Location</label>
-        <input type="text" name="location" class="form-control">
-    </div>
-    <div class="form-group">
-        <label for="contact_info">Contact Info</label>
-        <input type="text" name="contact_info" class="form-control">
-    </div>
-    <div class="form-group">
-        <label for="status">Status</label>
-        <select name="status" class="form-control">
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="notes">Note</label>
-        <textarea name="notes" class="form-control"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Create Supplier</button>
-</form>
-@endsection
+</x-app-layout>
