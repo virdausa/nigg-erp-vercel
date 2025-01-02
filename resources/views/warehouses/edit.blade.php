@@ -1,21 +1,24 @@
-@extends('layouts.app')
-
-@section('title', 'Edit Warehouse')
-
-@section('content')
-    <h1>Edit Warehouse</h1>
-    <form action="{{ route('warehouses.update', $warehouse->id) }}" method="POST">
+<x-modal-edit trigger="Edit" title="Edit Warehouse">
+    <form action="{{ route('warehouses.update', $warehouse->id) }}" method="POST" class="space-y-6">
         @csrf
-        @method('PUT') <!-- This is required to specify an update request -->
+        @method('PUT')
 
+        <!-- Warehouse Name -->
         <div class="form-group">
-            <label for="name">Warehouse Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ $warehouse->name }}" required>
+            <x-input-label for="name">Warehouse Name</x-input-label>
+            <x-text-input type="text" id="name" name="name" class="w-full" value="{{ $warehouse->name }}" required />
         </div>
+
+        <!-- Location -->
         <div class="form-group">
-            <label for="location">Location</label>
-            <input type="text" class="form-control" id="location" name="location" value="{{ $warehouse->location }}">
+            <x-input-label for="location">Location</x-input-label>
+            <x-text-input type="text" id="location" name="location" class="w-full" value="{{ $warehouse->location }}" />
         </div>
-        <button type="submit" class="btn btn-primary">Update Warehouse</button>
+
+        <!-- Actions -->
+        <div class="flex justify-end space-x-4">
+            <x-primary-button type="submit">Update Warehouse</x-primary-button>
+            <button type="button" @click="isOpen = false" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700">Cancel</button>
+        </div>
     </form>
-@endsection
+</x-modal-edit>

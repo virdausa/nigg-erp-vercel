@@ -1,36 +1,53 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">
+            {{ __('Warehouse List') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Warehouse List')
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-white">
+                    <h1 class="text-2xl font-bold mb-6">Warehouse List</h1>
 
-@section('content')
-    <h1>Warehouse List</h1>
-    <a href="{{ route('warehouses.create') }}" class="btn btn-primary mb-3">Add New Warehouse</a>
-	<a href="{{ route('locations.index') }}" class="btn btn-secondary mb-3">Manage Location</a>
-    <table class="table table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($warehouses as $warehouse)
-                <tr>
-                    <td>{{ $warehouse->id }}</td>
-                    <td>{{ $warehouse->name }}</td>
-                    <td>{{ $warehouse->location }}</td>
-                    <td>
-                        <a href="{{ route('warehouses.edit', $warehouse->id) }}" class="btn btn-warning">Edit</a>
-                        <form action="{{ route('warehouses.destroy', $warehouse->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-@endsection
+                    <!-- Actions -->
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 mb-4">
+                        <div>
+                            @include('warehouses.create')
+                            <x-button :route="route('locations.index')">Manage Location</x-button>
+                        </div>
+                    </div>
+
+                    <!-- Warehouse Table -->
+                    <x-table-table>
+                        <x-table-thead>
+                            <tr>
+                                <x-table-th>ID</x-table-th>
+                                <x-table-th>Name</x-table-th>
+                                <x-table-th>Location</x-table-th>
+                                <x-table-th>Actions</x-table-th>
+                            </tr>
+                        </x-table-thead>
+                        <x-table-tbody>
+                            @foreach ($warehouses as $warehouse)
+                                <tr>
+                                    <x-table-td>{{ $warehouse->id }}</x-table-td>
+                                    <x-table-td>{{ $warehouse->name }}</x-table-td>
+                                    <x-table-td>{{ $warehouse->location }}</x-table-td>
+                                    <x-table-td>
+                                        <div class="flex items-center space-x-2">
+                                            
+                                            @include('warehouses.edit', ['warehouse' => $warehouse])
+                                            <x-button-delete :route="route('warehouses.destroy', $warehouse->id)" />
+                                        </div>
+                                    </x-table-td>
+                                </tr>
+                            @endforeach
+                        </x-table-tbody>
+                    </x-table-table>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
