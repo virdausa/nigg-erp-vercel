@@ -79,4 +79,6 @@
             @endif
         </div>
     </form>
+    <script src="{{ asset('js/phoneFormatter.js') }}"></script>
+
 </section>

@@ -15,7 +15,9 @@
                     <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 mb-4">
                         <div>
                             @include('warehouses.create')
-                            <x-button :route="route('locations.index')">Manage Location</x-button>
+                            <x-responsive-nav-link :href="route('locations.index')">
+                                    {{ __('Manage Location') }}
+                                </x-responsive-nav-link>
                         </div>
                     </div>
 
@@ -31,7 +33,7 @@
                         </x-table-thead>
                         <x-table-tbody>
                             @foreach ($warehouses as $warehouse)
-                                <tr>
+                                <x-table-tr>
                                     <x-table-td>{{ $warehouse->id }}</x-table-td>
                                     <x-table-td>{{ $warehouse->name }}</x-table-td>
                                     <x-table-td>{{ $warehouse->location }}</x-table-td>
@@ -42,7 +44,7 @@
                                             <x-button-delete :route="route('warehouses.destroy', $warehouse->id)" />
                                         </div>
                                     </x-table-td>
-                                </tr>
+                                </x-table-tr>
                             @endforeach
                         </x-table-tbody>
                     </x-table-table>
