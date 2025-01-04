@@ -1,5 +1,5 @@
 <x-modal-create trigger="Create New Warehouse" title="Create New Warehouse">
-    <form action="{{ route('warehouses.store') }}" method="POST" class="space-y-6">
+    <form action="{{ route('warehouses.store') }}" method="POST" class="">
         @csrf
 
         <!-- Warehouse Name -->
