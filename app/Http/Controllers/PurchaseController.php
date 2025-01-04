@@ -34,6 +34,7 @@ class PurchaseController extends Controller
 	// Store the new purchase
 	public function store(Request $request)
 	{
+		// dd($request->all());
 		$request->validate([
 			'supplier_id' => 'required|exists:suppliers,id',
 			'purchase_date' => 'required|date',
