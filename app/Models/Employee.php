@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Role;  // Pastikan Role diimport
 
 class Employee extends Model
 {
@@ -24,15 +26,27 @@ class Employee extends Model
         'out_date' => 'date',
     ];
 
-    // Relationships
+    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // Relasi ke Role
     public function role()
     {
-        return $this->belongsTo(\Spatie\Permission\Models\Role::class);
+        return $this->belongsTo(Role::class);  // Menghubungkan dengan Role
+    }
+
+    // Mengakses permissions yang terkait dengan role
+    public function permissions()
+    {
+        return $this->role->permissions;  // Mengakses permissions yang dimiliki oleh role
+    }
+
+    // Menambahkan metode untuk memeriksa permission langsung dari role
+    public function can($permission)
+    {
+        return $this->permissions()->contains('name', $permission);  // Memeriksa apakah role memiliki permission
     }
 }
-

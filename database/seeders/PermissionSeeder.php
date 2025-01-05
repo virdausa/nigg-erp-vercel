@@ -224,7 +224,7 @@ class PermissionSeeder extends Seeder
 
              'Sales Manager' => [
                  'purchases sidebar',
-                 'customer sidebar',
+                 'customers sidebar',
                  'sales sidebar',
                  'outbound-request sidebar',
                  'products sidebar',
@@ -247,7 +247,7 @@ class PermissionSeeder extends Seeder
 
              'Sales Team' => [
                  'purchases sidebar',
-                 'customer sidebar',
+                 'customers sidebar',
                  'sales sidebar',
                  'outbound-request sidebar',
                  'products sidebar',

@@ -1,21 +1,16 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
 
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Kolom dan relasi yang ada di User tidak berubah
     protected $fillable = [
         'name',
         'email',
@@ -27,28 +22,30 @@ class User extends Authenticatable
         'tgl_keluar', 
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'tgl_lahir' => 'date',    // Ensure 'tgl_lahir' is cast to a date
-            'tgl_keluar' => 'date',   // Ensure 'tgl_keluar' is cast to a date
+            'tgl_lahir' => 'date',    
+            'tgl_keluar' => 'date',   
         ];
+    }
+
+    // Relasi ke Employee
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
+    }
+
+    // Memeriksa permission berdasarkan Employee
+    public function canEmployee($permission)
+    {
+        return $this->employee->can($permission);
     }
 }
