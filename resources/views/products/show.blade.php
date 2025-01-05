@@ -47,14 +47,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 flex justify-end gap-6">
-                        <a href="{{ route('products.index') }}" class="inline-block">
-                            <x-secondary-button
-                                class="hover:bg-gray-200 dark:hover:bg-gray-600">Cancel</x-secondary-button>
+                    <div class="flex gap-3 justify-end mt-8">
+                        <a href="{{ route('products.index') }}">
+                            <x-secondary-button type="button">Cancel</x-secondary-button>
                         </a>
-                        <a href="{{ route('products.edit', $product->id) }}" class="inline-block">
-                            <x-primary-button class="hover:bg-indigo-600 dark:hover:bg-indigo-700">Edit
-                                Product</x-primary-button>
+                        <a href="{{ route('products.edit', $product->id) }}">
+                            <x-primary-button type="button">Edit Product</x-primary-button>
                         </a>
                     </div>
                 </div>

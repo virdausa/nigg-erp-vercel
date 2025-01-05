@@ -44,6 +44,7 @@
                                 <x-table-th>ID</x-table-th>
                                 <x-table-th>Sku</x-table-th>
                                 <x-table-th>Name</x-table-th>
+                                <x-table-th>Price</x-table-th>
                                 <x-table-th>Status</x-table-th>
                                 <x-table-th>Notes</x-table-th>
                                 <x-table-th>Actions</x-table-th>
@@ -55,6 +56,7 @@
                                     <x-table-td>{{ $product->id }}</x-table-td>
                                     <x-table-td>{{ $product->sku }}</x-table-td>
                                     <x-table-td>{{ $product->name }}</x-table-td>
+                                    <x-table-td>{{ $product->price }}</x-table-td>
                                     <x-table-td>{{ $product->status }}</x-table-td>
                                     <x-table-td>{{ $product->notes }}</x-table-td>
                                     <x-table-td>

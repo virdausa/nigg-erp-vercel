@@ -15,6 +15,7 @@ class Product extends Model
 		'sku',
 		'weight',
 		'price',
+		'status',
 		'notes'
 	];
 

@@ -12,6 +12,7 @@ class Sale extends Model
     protected $fillable = [
         'customer_id', 
         'sale_date', 
+        'employee_id',
         'total_amount', 
         'warehouse_id', 
         'status', 
@@ -19,6 +20,7 @@ class Sale extends Model
         'admin_notes',
 		'expedition_id',
 		'estimated_shipping_fee',
+        'shipping_fee_discount',
     ];
 
     public function products()

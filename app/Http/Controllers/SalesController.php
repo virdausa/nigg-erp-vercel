@@ -9,12 +9,13 @@ use App\Models\Warehouse;
 use App\Models\Expedition;
 use App\Models\OutboundRequest;
 use App\Models\Customer;
+use App\Models\Employee;
 use App\Models\CustomerComplaint;
 use Illuminate\Http\Request;
 
 class SalesController extends Controller
 {
-    public function index(Request $request)
+	public function index(Request $request)
 	{
 		$query = Sale::with(['products.salesProducts', 'warehouse', 'customer'])->orderBy('sale_date', 'desc');
 
@@ -27,7 +28,7 @@ class SalesController extends Controller
 		return view('sales.index', compact('sales'));
 	}
 
-	
+
 	public function create()
 	{
 		$warehouses = Warehouse::all();
@@ -39,10 +40,14 @@ class SalesController extends Controller
 
 	public function store(Request $request)
 	{
+		$user = $request->user();
+		$employee = Employee::where('user_id', $user->id)->first();
+
 		$validated = $request->validate([
 			'customer_id' => 'required|integer',
 			'sale_date' => 'required|date',
 			'warehouse_id' => 'required|exists:warehouses,id',
+			'shipping_fee_discount' => 'required|numeric|min:0',
 			'products' => 'required|array', // Expecting products as an array
 			'products.*.product_id' => 'required|exists:products,id',
 			'products.*.quantity' => 'required|integer|min:1',
@@ -53,8 +58,10 @@ class SalesController extends Controller
 		// Create sale
 		$sale = Sale::create([
 			'customer_id' => $validated['customer_id'],
+			'employee_id' => $employee->id,
 			'sale_date' => $validated['sale_date'],
 			'warehouse_id' => $validated['warehouse_id'],
+			'shipping_fee_discount' => $validated['shipping_fee_discount'],
 			'total_amount' => collect($validated['products'])->sum(function ($product) {
 				return $product['quantity'] * $product['price'];
 			}),
@@ -72,13 +79,13 @@ class SalesController extends Controller
 		}
 
 		$sale->save();
-	
+
 		return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
 	}
 
 
 	public function show($id)
- 	{
+	{
 		$sale = Sale::with(['products', 'warehouse', 'expedition', 'customer'])->findOrFail($id);
 		return view('sales.show', compact('sale'));
 	}
@@ -92,13 +99,16 @@ class SalesController extends Controller
 		$products = Product::all();
 		$expeditions = Expedition::all(); // Fetch expeditions
 		$outboundRequests = OutboundRequest::where('sales_order_id', $id)->get(); // Fetch related OutboundRequest
-		
+
 		return view('sales.edit', compact('sale', 'warehouses', 'products', 'expeditions', 'outboundRequests', 'customers'));
 	}
 
 
 	public function update(Request $request, $id)
 	{
+		$user = $request->user();
+		$employee = Employee::where('user_id', $user->id)->first();
+
 		$validated = $request->validate([
 			'customer_id' => 'required|integer',
 			'sale_date' => 'required|date',
@@ -109,14 +119,17 @@ class SalesController extends Controller
 			'products.*.price' => 'required|numeric|min:0',
 			'products.*.note' => 'nullable|string', // Handle product notes
 			'expedition_id' => 'required|exists:expeditions,id', // Validate expedition
+			'shipping_fee_discount' => 'required|numeric|min:0',
 			'estimated_shipping_fee' => 'nullable|numeric|min:0',
 		]);
 
 		$sale = Sale::findOrFail($id);
 		$sale->update([
 			'customer_id' => $validated['customer_id'],
+			'employee_id' => $employee->id,
 			'sale_date' => $validated['sale_date'],
 			'warehouse_id' => $validated['warehouse_id'],
+			'shipping_fee_discount' => $validated['shipping_fee_discount'],
 			'expedition_id' => $validated['expedition_id'], // Update expedition in the same call
 			'estimated_shipping_fee' => $validated['estimated_shipping_fee'],
 		]);
@@ -138,7 +151,7 @@ class SalesController extends Controller
 		});
 		$sale->update(['total_amount' => $totalAmount]);
 
-		if($sale->status == 'In Transit' || $sale->status == 'Customer Complaint') {
+		if ($sale->status == 'In Transit' || $sale->status == 'Customer Complaint') {
 			$validated += $request->validate([
 				'received_quantities' => 'required|array',
 				'received_quantities.*.*' => 'nullable|integer|min:0',
@@ -147,21 +160,21 @@ class SalesController extends Controller
 			// Update received quantities
 			$receivedQuantities = $validated['received_quantities'];
 			$receivedQuantitiesSales = [];
-			foreach($receivedQuantities as $outboundRequestId => $receivedQuantitiesEachOuboundRequest) {
+			foreach ($receivedQuantities as $outboundRequestId => $receivedQuantitiesEachOuboundRequest) {
 				$outboundRequest = OutboundRequest::findOrFail($outboundRequestId);
-				
-				foreach($receivedQuantitiesEachOuboundRequest as $productId => $receivedQuantity) {
-					if(isset($receivedQuantitiesSales[$productId])) {
+
+				foreach ($receivedQuantitiesEachOuboundRequest as $productId => $receivedQuantity) {
+					if (isset($receivedQuantitiesSales[$productId])) {
 						$receivedQuantitiesSales[$productId] += $receivedQuantity;
 					} else {
 						$receivedQuantitiesSales[$productId] = $receivedQuantity;
 					}
 				}
-				
+
 				$outboundRequest->update(['received_quantities' => $receivedQuantitiesEachOuboundRequest]);
 
-				if($outboundRequest->status == 'In Transit' && $request['submit'] == 'Update Received Quantities'){
-					if($outboundRequest->received_quantities == $outboundRequest->requested_quantities) {
+				if ($outboundRequest->status == 'In Transit' && $request['submit'] == 'Update Received Quantities') {
+					if ($outboundRequest->received_quantities == $outboundRequest->requested_quantities) {
 						$outboundRequest->update(['status' => 'Ready to Complete']);
 					} else {
 						$outboundRequest->update(['status' => 'Customer Complaint']);
@@ -174,27 +187,27 @@ class SalesController extends Controller
 			// check whether all received quantities are correct
 			$allReceivedCorrectly = true;
 			$salesRequestedQuantities = SalesProduct::where('sale_id', $sale->id)->get();
-			foreach($salesRequestedQuantities as $requestedQuantity) {
+			foreach ($salesRequestedQuantities as $requestedQuantity) {
 				$productId = $requestedQuantity->product_id;
 
-				if($receivedQuantitiesSales[$productId] != $requestedQuantity->quantity) {
+				if ($receivedQuantitiesSales[$productId] != $requestedQuantity->quantity) {
 					$allReceivedCorrectly = false;
 				}
 			}
 
-			if($request['submit'] == 'Update Received Quantities'){
-				if($allReceivedCorrectly){
+			if ($request['submit'] == 'Update Received Quantities') {
+				if ($allReceivedCorrectly) {
 					$sale->update(['status' => 'Completed']);
 				} else {
 					$sale->update(['status' => 'Customer Complaint']);
 				}
 			}
 		}
-		
+
 		return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
 	}
 
-	
+
 	public function destroy($id)
 	{
 		$sale = Sale::findOrFail($id);
@@ -225,32 +238,31 @@ class SalesController extends Controller
 				'notes' => 'Outbound request created upon status change to Unpaid',
 			]);
 		}
-		
+
 		// Set status to "Pending Shipment" after confirming payment
 		if ($status == 'Pending Shipment') {
 			// Check if the sale is in the correct status
 			if ($sale->status !== 'Unpaid') {
 				return redirect()->back()->with('error', 'This sale cannot be marked as paid.');
 			}
-			
+
 			// Update the related Outbound Request status
 			$outboundRequest = OutboundRequest::where('sales_order_id', $sale->id)
-												->where('status', 'Pending Confirmation')
-												->latest()->first();
+				->where('status', 'Pending Confirmation')
+				->latest()->first();
 			if ($outboundRequest) {
 				$outboundRequest->status = 'Packing & Shipping';
 				$outboundRequest->save();
 			}
-			
+
 			$sale->update(['status' => $status]);
-		    return redirect()->route('sales.show', $sale->id)
-							->with('success', 'Sale marked as paid and is now pending shipment.');
+			return redirect()->route('sales.show', $sale->id)
+				->with('success', 'Sale marked as paid and is now pending shipment.');
 		}
-		
+
 		$sale->update(['status' => $status]);
 
 		return redirect()->route('sales.edit', $sale->id)
-						 ->with('success', 'Status updated successfully!');
+			->with('success', 'Status updated successfully!');
 	}
-
 }
