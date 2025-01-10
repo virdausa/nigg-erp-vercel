@@ -39,6 +39,12 @@
                     {{ __('Daftar akun?') }}
                 </a>
 
+                <span class="mx-4">|</span>
+
+                <a class="underline text-sm text-gray-600 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                    {{ __('Lupa Password?') }}
+                </a>
+
             <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>
