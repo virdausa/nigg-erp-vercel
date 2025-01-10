@@ -37,7 +37,7 @@
                         </x-table-thead>
                         <tbody>
                             @foreach ($employees as $employee)
-                                <tr>
+                                <x-table-tr>
                                     <x-table-td>{{ $loop->iteration }}</x-table-td>
                                     <x-table-td>{{ $employee->user->name }}</x-table-td>
                                     <x-table-td>{{ $employee->reg_date->format('Y-m-d') }}</x-table-td>
@@ -57,7 +57,7 @@
                                             </form>
                                         </div>
                                     </x-table-td>
-                                </tr>
+                                </x-table-tr>
                             @endforeach
                         </tbody>
                     </x-table-table>

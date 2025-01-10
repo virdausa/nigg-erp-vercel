@@ -8,6 +8,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\InventoryController;
+
 use App\Http\Controllers\LocationController;
 
 use App\Http\Controllers\CustomerComplaintController;
@@ -48,6 +50,9 @@ Route::resource('sales', SalesController::class);
 Route::resource('suppliers', SupplierController::class);
 Route::resource('warehouses', WarehouseController::class);
 
+Route::resource('inventory', InventoryController::class);
+Route::get('/inventory/adjust', [InventoryController::class, 'adjust'])->name('inventory.adjust');
+Route::get('/inventory/history', [InventoryController::class, 'history'])->name('inventory.history');
 
 Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
 Route::put('sales/{sale}', [SalesController::class, 'update'])->name('sales.update');

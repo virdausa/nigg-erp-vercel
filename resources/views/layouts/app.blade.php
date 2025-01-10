@@ -157,16 +157,23 @@
         </script>
     @endif
     <script>
-        $(document).ready(function () {
+    $(document).ready(function () {
+        if (typeof simpleDatatables !== 'undefined' && typeof simpleDatatables.DataTable !== 'undefined') {
+            // Dynamically initialize DataTables for specific IDs
+            const tableIds = ["search-table", "search-table1"]; // Add all unique IDs here
+            tableIds.forEach(function (id) {
+                const tableElement = document.getElementById(id);
+                if (tableElement) {
+                    new simpleDatatables.DataTable(`#${id}`, {
+                        searchable: true,
+                        sortable: true
+                    });
+                }
+            });
+        }
+    });
+</script>
 
-            if (document.getElementById("search-table") && typeof simpleDatatables.DataTable !== 'undefined') {
-                const dataTable = new simpleDatatables.DataTable("#search-table", {
-                    searchable: true,
-                    sortable: true
-                });
-            }
-
-        });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>

@@ -1,63 +1,78 @@
-@extends('layouts.app')
+<x-app-layout>
+    <div class="py-12">
+        <div class="max-w-7xl my-10 mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                <h3 class="text-lg font-bold dark:text-white">Manage Inventory</h3>
+                <p class="text-sm dark:text-gray-200 mb-6">Create, edit, and manage your inventories listings.</p>
 
-@section('content')
-    <h1>Inventory</h1>
-    <a href="{{ route('inventory.adjustForm') }}" class="btn btn-primary mb-3">Adjust Inventory</a>
-    <a href="{{ route('inventory.history') }}" class="btn btn-secondary mb-3">Inventory History</a>
+                    <div
+                        class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 mb-4">
 
-    <!-- Filters -->
-    <form method="GET" action="{{ route('inventory.index') }}">
-        <input class="form-control mb-3" type="text" name="search" placeholder="Search by product or warehouse" value="{{ request()->query('search') }}">
-        <button type="submit" class="btn btn-primary mb-3">Search</button>
-    </form>
+                        <div class="w-full md:w-auto flex justify-end gap-3">
+                        <x-button href="{{route('inventory.adjust')}}"
+                        class="border rounded border-gray-400 dark:border-gray-700 p-2 text-lg hover:underline text-gray-700 dark:text-gray-400">Adjust Inventory</x-button>    
+                        <x-button href="{{route('inventory.adjust')}}"
+                        class="border rounded border-gray-400 dark:border-gray-700 p-2 text-lg hover:underline text-gray-700 dark:text-gray-400">Inventory History</x-button>    
+                            
+                        </div>
+                    </div>
 
-    <!-- Overall Stock -->
-    <h2>Stock Overview</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Available Stock</th>
-                <th>Incoming Stock</th>
-                <th>Reserved Stock</th>
-                <th>In Transit Stock</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($inventories as $inventory)
-                <tr>
-                    <td>{{ $inventory->product->name }}</td>
-                    <td>{{ $inventory->quantity }}</td>
-                    <td>0</td> <!-- Replace with logic for incoming -->
-                    <td>{{ $inventory->reserved_quantity }}</td> 
-                    <td>{{ $inventory->in_transit_quantity }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
 
-    <!-- Stock by Location -->
-    <h2>Stock by Location</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Warehouse</th>
-                <th>Product</th>
-                <th>Room</th>
-                <th>Rack</th>
-                <th>Quantity</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($inventoryByLocations as $locationStock)
-                <tr>
-                    <td>{{ $locationStock->warehouse->name }}</td>
-                    <td>{{ $locationStock->product->name }}</td>
-                    <td>{{ $locationStock->location->room ?? 'N/A' }}</td>
-                    <td>{{ $locationStock->location->rack ?? 'N/A' }}</td>
-                    <td>{{ $locationStock->total_quantity }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-@endsection
+                   
+                    <div class="my-6 flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+
+                    <!-- Overall Stock -->
+                    <h3 class="text-lg font-bold dark:text-white">Stock Overview</h3>
+                    <x-table-table class="table table-bordered" id="search-table">
+                        <x-table-thead>
+                            <tr>
+                                <x-table-th>Product</x-table-th>
+                                <x-table-th>Available Stock</x-table-th>
+                                <x-table-th>Incoming Stock</x-table-th>
+                                <x-table-th>Reserved Stock</x-table-th>
+                                <x-table-th>In Transit Stock</x-table-th>
+                            </tr>
+                        </x-table-thead>
+                        <x-table-tbody>
+                            @foreach ($inventories as $inventory)
+                                <x-table-tr>
+                                    <x-table-td>{{ $inventory->product->name }}</x-table-td>
+                                    <x-table-td>{{ $inventory->quantity }}</x-table-td>
+                                    <x-table-td>0</x-table-td> <!-- Replace with logic for incoming -->
+                                    <x-table-td>{{ $inventory->reserved_quantity }}</x-table-td>
+                                    <x-table-td>{{ $inventory->in_transit_quantity }}</x-table-td>
+                                </x-table-tr>
+                            @endforeach
+                        </x-table-tbody>
+                    </x-table-table>
+
+                    <div class="my-6 flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+                    <h3 class="text-lg font-bold dark:text-white">Stock by Location</h3>
+                    <x-table-table class="table table-bordered" id="search-table1">
+                        <x-table-thead>
+                            <tr>
+                                <x-table-th>Warehouse</x-table-th>
+                                <x-table-th>Product</x-table-th>
+                                <x-table-th>Room</x-table-th>
+                                <x-table-th>Rack</x-table-th>
+                                <x-table-th>Quantity</x-table-th>
+                            </tr>
+                        </x-table-thead>
+                        <x-table-tbody>
+                            @foreach ($inventoryByLocations as $locationStock)
+                                <x-table-tr>
+                                    <x-table-td>{{ $locationStock->warehouse->name }}</x-table-td>
+                                    <x-table-td>{{ $locationStock->product->name }}</x-table-td>
+                                    <x-table-td>{{ $locationStock->location->room ?? 'N/A' }}</x-table-td>
+                                    <x-table-td>{{ $locationStock->location->rack ?? 'N/A' }}</x-table-td>
+                                    <x-table-td>{{ $locationStock->total_quantity }}</x-table-td>
+                                </x-table-tr>
+                            @endforeach
+                        </x-table-tbody>
+                    </x-table-table>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
