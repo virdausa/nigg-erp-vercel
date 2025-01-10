@@ -9,16 +9,21 @@
         <div class="max-w-7xl my-10 mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                        Employees
-                    </h1>
-                    <a href="{{ route('employees.create') }}">
-                        <x-button type="button" class="mb-4" variant="primary">
-                            Add New Employees
-                        </x-button>
-                    </a>
+                <h3 class="text-lg font-bold dark:text-white">Manage Employees</h3>
+				<p class="text-sm dark:text-gray-200 mb-6">Create, edit, and manage your employees listings.</p>
+				<div class="my-6 flex-grow border-t border-gray-300 dark:border-gray-700"></div>
 
-                    <x-table-table> 
+					<div
+                        class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 mb-4">
+                        
+                        <div class="w-full md:w-auto flex justify-end">
+                            <a href="{{ route('employees.create') }}">
+                                <x-button-add :route="route('employees.create')" text="Add Purchases" />
+                            </a>
+                        </div>
+                    </div>
+
+                    <x-table-table id="search-table"> 
                         <x-table-thead>
                             <tr>
                                 <x-table-th>#</x-table-th>
@@ -42,14 +47,15 @@
                                     </x-table-td>
                                     <x-table-td>{{ $employee->role->name }}</x-table-td>
                                     <x-table-td>
-                                        <a href="{{ route('employees.edit', $employee->id_employee) }}"
-                                            class="text-yellow-500 hover:text-yellow-700">Edit</a>
-                                        <form action="{{ route('employees.destroy', $employee->id_employee) }}"
-                                            method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:text-red-700">Delete</button>
-                                        </form>
+                                    <div class="flex items-center space-x-2">
+                                            
+                                            <x-button-edit :route="route('employees.edit', $employee->id_employee)" />
+                                            <form action="{{ route('employees.destroy', $employee->id_employee) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <x-button-delete :route="route('employees.destroy', $employee->id_employee)" />
+                                            </form>
+                                        </div>
                                     </x-table-td>
                                 </tr>
                             @endforeach

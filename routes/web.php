@@ -9,7 +9,6 @@ use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\LocationController;
-
 use App\Http\Controllers\CustomerComplaintController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -33,26 +32,17 @@ route::resource("customers", CustomerController::class);
 route::resource("purchases", PurchaseController::class);
 route::resource("locations", LocationController::class);
 
-
-
-route::resource("products", controller: ProductController::class);
-
 Route::resource('sales', SalesController::class);
 Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
 Route::put('sales/{sale}', [SalesController::class, 'update'])->name('sales.update');
 Route::resource('customer_complaints', CustomerComplaintController::class);
 Route::put('customer_complaints/{customer_complaint}/resolve', [CustomerComplaintController::class, 'resolve'])->name('customer_complaints.resolve');
 
-Route::resource('sales', SalesController::class);
+route::resource("products", controller: ProductController::class);
 
 Route::resource('suppliers', SupplierController::class);
 Route::resource('warehouses', WarehouseController::class);
 
-
-Route::get('sales/{sale}/status/{status}', [SalesController::class, 'updateStatus'])->name('sales.updateStatus');
-Route::put('sales/{sale}', [SalesController::class, 'update'])->name('sales.update');
-Route::resource('customer_complaints', CustomerComplaintController::class);
-Route::put('customer_complaints/{customer_complaint}/resolve', [CustomerComplaintController::class, 'resolve'])->name('customer_complaints.resolve');
 
 Route::resource('roles', RoleController::class);
 Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
