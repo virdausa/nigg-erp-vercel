@@ -114,7 +114,7 @@ class SalesController extends Controller
 	{
 		$user = $request->user();
 		$employee = Employee::where('user_id', $user->id)->first();
-
+		// dd($employee);
 		$validated = $request->validate([
 			'customer_id' => 'required|integer',
 			'sale_date' => 'required|date',
@@ -124,21 +124,22 @@ class SalesController extends Controller
 			'products.*.quantity' => 'required|integer|min:1',
 			'products.*.price' => 'required|numeric|min:0',
 			'products.*.note' => 'nullable|string', // Handle product notes
-			'expedition_id' => 'required|exists:expeditions,id', // Validate expedition
-			'shipping_fee_discount' => 'required|numeric|min:0',
+			'expedition_id' => 'nullable|exists:expeditions,id', // Validate expedition
+			'shipping_fee_discount' => 'nullable|numeric|min:0',
 			'estimated_shipping_fee' => 'nullable|numeric|min:0',
 		]);
-
+		
 		$sale = Sale::findOrFail($id);
 		$sale->update([
 			'customer_id' => $validated['customer_id'],
-			'employee_id' => $employee->id,
+			'employee_id' => $employee->id_employee,
 			'sale_date' => $validated['sale_date'],
 			'warehouse_id' => $validated['warehouse_id'],
-			'shipping_fee_discount' => $validated['shipping_fee_discount'],
-			'expedition_id' => $validated['expedition_id'], // Update expedition in the same call
+			'shipping_fee_discount' => $validated['shipping_fee_discount'] ?? 0,
+			'expedition_id' => $validated['expedition_id']?? NULL, // Update expedition in the same call
 			'estimated_shipping_fee' => $validated['estimated_shipping_fee'],
 		]);
+		
 
 		// Sync products with updated quantities, prices, and notes
 		$productData = [];

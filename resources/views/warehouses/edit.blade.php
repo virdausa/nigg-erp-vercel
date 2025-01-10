@@ -18,7 +18,8 @@
         <!-- Actions -->
         <div class="flex justify-end space-x-4">
             <x-primary-button type="submit">Update Warehouse</x-primary-button>
-            <button type="button" @click="isOpen = false" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700">Cancel</button>
+            <button type="button" @click="isOpen = false"
+                class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700">Cancel</button>
         </div>
     </form>
 </x-modal-edit>

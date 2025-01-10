@@ -13,7 +13,7 @@
 
                             <div class="mb-4">
                                 <x-input-label for="supplier_id">Supplier</x-input-label>
-                                <select name="supplier_id" id="supplier_id" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" required>
+                                <select name="supplier_id" id="supplier_id" class="bg-gray-100 w-full px-4 py-2 bg-gray-100 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" required>
                                     @foreach($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}" {{ $purchase->supplier_id == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
                                     @endforeach
@@ -22,12 +22,12 @@
 
                             <div class="mb-4">
                                 <x-input-label for="purchase_date">Purchase Date</x-input-label>
-                                <input type="date" name="purchase_date" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->purchase_date }}" {{ $purchase->status != 'Planned' ? 'readonly' : '' }}>
+                                <input type="date" name="purchase_date" class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->purchase_date }}" {{ $purchase->status != 'Planned' ? 'readonly' : '' }}>
                             </div>
 
                             <div class="mb-4">
                                 <x-input-label for="warehouse_id">Select Warehouse</x-input-label>
-                                <select name="warehouse_id" id="warehouse_id" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" {{ $purchase->status != 'Planned' ? 'readonly' : '' }}>
+                                <select name="warehouse_id" id="warehouse_id" class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" {{ $purchase->status != 'Planned' ? 'readonly' : '' }}>
                                     @foreach($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}" {{ $purchase->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
                                     @endforeach
@@ -42,23 +42,23 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div class="mb-4">
                                     <x-input-label for="shipped_date">Shipped Date</x-input-label>
-                                    <input type="date" name="shipped_date" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->shipped_date }}" {{ $purchase->status == 'Planned' ? '' : 'readonly' }}>
+                                    <input type="date" name="shipped_date" class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->shipped_date }}" {{ $purchase->status == 'Planned' ? '' : 'readonly' }}>
                                 </div>
 
                                 <div class="mb-4">
                                     <x-input-label for="expedition">Expedition</x-input-label>
-                                    <input type="text" name="expedition" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->expedition }}" {{ $purchase->status == 'Planned' ? '' : 'readonly' }}>
+                                    <input type="text" name="expedition" class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->expedition }}" {{ $purchase->status == 'Planned' ? '' : 'readonly' }}>
                                 </div>
 
                                 <div class="mb-4">
                                     <x-input-label for="tracking_no">Tracking Number</x-input-label>
-                                    <input type="text" name="tracking_no" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->tracking_no }}" {{ $purchase->status == 'Planned' ? '' : 'readonly' }}>
+                                    <input type="text" name="tracking_no" class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" value="{{ $purchase->tracking_no }}" {{ $purchase->status == 'Planned' ? '' : 'readonly' }}>
                                 </div>
                             </div>
 
                             <div class="mb-4">
                                 <x-input-label for="notes">Notes</x-input-label>
-                                <textarea name="notes" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" {{ $purchase->status == 'Completed' ? 'readonly' : '' }}>{{ $purchase->notes }}</textarea>
+                                <textarea name="notes" class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white" {{ $purchase->status == 'Completed' ? 'readonly' : '' }}>{{ $purchase->notes }}</textarea>
                             </div>
 
                             <h3 class="text-lg font-bold mt-6">Products</h3>

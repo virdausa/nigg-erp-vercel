@@ -30,7 +30,7 @@
 								<x-input-label for="purchase_date">Purchase Date</x-input-label>
 								<input type="date" name="purchase_date"
 									class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
-									required>
+									required  value="<?= date('Y-m-d'); ?>">
 							</div>
 
 							<div class="mb-4">
@@ -80,7 +80,7 @@
 								</div>
 							</div>
 
-							<x-button type="button" id="add-product" class="mr-3">Add Another Product</x-button>
+							<x-button2 type="button" id="add-product" class="mr-3">Add Another Product</x-button>
 							<x-primary-button>Save Purchase</x-primary-button>
 							<a href="{{ route('purchases.index') }}"
 								class="border rounded border-gray-400 dark:border-gray-700 p-2 ml-3 text-sm hover:underline text-gray-700 dark:text-gray-400">Cancel</a>
