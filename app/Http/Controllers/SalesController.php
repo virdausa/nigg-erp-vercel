@@ -40,32 +40,38 @@ class SalesController extends Controller
 
 	public function store(Request $request)
 	{
+		// $employee = Employee::where('user_id', $user->id)->first();
+
+				
+
 		$user = $request->user();
 		$employee = Employee::where('user_id', $user->id)->first();
-
 		$validated = $request->validate([
 			'customer_id' => 'required|integer',
 			'sale_date' => 'required|date',
 			'warehouse_id' => 'required|exists:warehouses,id',
-			'shipping_fee_discount' => 'required|numeric|min:0',
+			'shipping_fee_discount' => 'nullable|numeric|min:0',
 			'products' => 'required|array', // Expecting products as an array
 			'products.*.product_id' => 'required|exists:products,id',
 			'products.*.quantity' => 'required|integer|min:1',
 			'products.*.price' => 'required|numeric|min:0',
 			'products.*.note' => 'nullable|string', // Note for each product
 		]);
+		
+
 
 		// Create sale
 		$sale = Sale::create([
 			'customer_id' => $validated['customer_id'],
-			'employee_id' => $employee->id,
+			'employee_id' => $employee->id_employee,
 			'sale_date' => $validated['sale_date'],
 			'warehouse_id' => $validated['warehouse_id'],
-			'shipping_fee_discount' => $validated['shipping_fee_discount'],
+			'shipping_fee_discount' => $validated['shipping_fee_discount'] ?? 0,
 			'total_amount' => collect($validated['products'])->sum(function ($product) {
 				return $product['quantity'] * $product['price'];
 			}),
 		]);
+		
 
 		// Create Sales Products
 		foreach ($validated['products'] as $product) {

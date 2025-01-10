@@ -17,6 +17,9 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
+        <a class="mr-4 underline text-sm text-gray-600 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+                    {{ __('Kembali ke halaman login') }}
+                </a>
             <x-primary-button>
                 {{ __('Email Password Reset Link') }}
             </x-primary-button>

@@ -8,23 +8,23 @@
                 
                     <h3 class="text-lg font-bold my-3">Supplier Details</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                        <div class="p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
                             <p class="text-sm text-gray-500 dark:text-gray-300">Supplier</p>
                             <p class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $purchase->supplier->name ?? 'N/A' }}</p>
                         </div>
-                        <div class="p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
                             <p class="text-sm text-gray-500 dark:text-gray-300">Purchase Date</p>
                             <p class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $purchase->purchase_date }}</p>
                         </div>
-                        <div class="p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
                             <p class="text-sm text-gray-500 dark:text-gray-300">Warehouse</p>
                             <p class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $purchase->warehouse->name ?? 'N/A' }}</p>
                         </div>
-                        <div class="p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
                             <p class="text-sm text-gray-500 dark:text-gray-300">Total Amount</p>
                             <p class="text-lg font-medium text-gray-900 dark:text-gray-100">Rp{{ number_format($purchase->total_amount, 2) }}</p>
                         </div>
-                        <div class="p-4 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
                             <p class="text-sm text-gray-500 dark:text-gray-300">Status</p>
                             <p class="text-lg font-medium inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
                                 {{ $purchase->status }}
