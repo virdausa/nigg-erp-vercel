@@ -106,6 +106,7 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="ms-3">Dashboard</span>
                 </a>
             </li>
+
             @if(Auth::user()->canEmployee('purchases sidebar'))
             <li>
                 <a href="{{ route('purchases.index') }}"
@@ -124,7 +125,7 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
    
             @endif
 
-
+ @if(Auth::user()->canEmployee('suppliers sidebar'))
             <li>
                 <a href="{{ route('suppliers.index') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -138,6 +139,10 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                         class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('customers sidebar'))
+
             <li>
                 <a href={{ route('customers.index') }}
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -149,6 +154,9 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Customers</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('products sidebar'))
             <li>
                 <a href="{{ route('products.index') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -160,6 +168,9 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Products</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('inventory sidebar'))
             <li>
                 <a href="{{ route('inventory.index') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -171,6 +182,10 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Inventory</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('warehouses sidebar'))
+
             <li>
                 <a href="{{ route('warehouses.index') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -182,6 +197,10 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Warehouses</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('sales sidebar'))
+
             <li>
                 <a href="{{ route('sales.index') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -196,6 +215,10 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Sales</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('customer-complaints sidebar'))
+
             <li>
                 <a href="{{ route('customer_complaints.index') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -210,6 +233,9 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Customer Complaints</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('inbound-request sidebar'))
             <li>
                 <a href="#"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -224,6 +250,10 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Inbound Request</span>
                 </a>
             </li>
+            @endif
+
+                        @if(Auth::user()->canEmployee('inbound-request sidebar'))
+
             <li>
                 <a href="#"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -238,6 +268,9 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Outbound Req</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('employees sidebar'))
 
             <li>
                 <a href={{ route('employees.index') }}
@@ -253,6 +286,9 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Karyawan</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('user sidebar'))
 
             <li>
                 <a href="#"
@@ -268,7 +304,9 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">User</span>
                 </a>
             </li>
+            @endif
 
+            @if(Auth::user()->canEmployee('role-access sidebar'))
             <li>
                 <a href="{{ route('roles.index') }}"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -283,6 +321,9 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Role Access</span>
                 </a>
             </li>
+            @endif
+
+            @if(Auth::user()->canEmployee('permissions sidebar'))
 
             <li>
                 <a href="{{ route('permissions.index') }}"
@@ -299,6 +340,7 @@ class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -transla
                     <span class="flex-1 ms-3 whitespace-nowrap">Permissions</span>
                 </a>
             </li>
+            @endif
         </ul>
     </div>
 

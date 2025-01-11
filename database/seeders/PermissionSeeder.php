@@ -16,6 +16,7 @@ class PermissionSeeder extends Seeder
         // Define permissions
         $permissions = [
             'purchases sidebar',
+            'inventory sidebar',
             'suppliers sidebar',
             'customers sidebar',
             'products sidebar',
@@ -26,7 +27,7 @@ class PermissionSeeder extends Seeder
             'outbound-request sidebar',
             'employees sidebar',
             'user sidebar',
-            'role access sidebar',
+            'role-access sidebar',
             'permissions sidebar',
             
             'crud role-access',
@@ -83,7 +84,7 @@ class PermissionSeeder extends Seeder
                 'outbound-request sidebar',
                 'employees sidebar',
                 'user sidebar',
-                'role access sidebar',
+                'role-access sidebar',
                 'permissions sidebar',
                 'crud user',
                 'crud employee',
@@ -111,7 +112,7 @@ class PermissionSeeder extends Seeder
                 'outbound-request sidebar',
                 'employees sidebar',
                 'user sidebar',
-                'role access sidebar',
+                'role-access sidebar',
                 'permissions sidebar',
                 'crud user',
                 'crud employee',
@@ -139,7 +140,7 @@ class PermissionSeeder extends Seeder
                 'outbound-request sidebar',
                 'employees sidebar',
                 'user sidebar',
-                'role access sidebar',
+                'role-access sidebar',
                 'permissions sidebar',
                 'crud user',
                 'crud employee',
@@ -162,7 +163,7 @@ class PermissionSeeder extends Seeder
                  'purchases sidebar',
                  'warehouses sidebar',
                  'inbound-request sidebar',
-                 'role access sidebar',
+                 'role-access sidebar',
 
                  'crud supplier',
                  'show-only inbound-request',
@@ -195,7 +196,7 @@ class PermissionSeeder extends Seeder
                  'products sidebar',
                  'warehouses sidebar',
                  'inbound-request sidebar',
-                 'role access sidebar',
+                 'role-access sidebar',
 
                  'crud inbound-request',
                  'crud warehouse',
@@ -230,7 +231,7 @@ class PermissionSeeder extends Seeder
                  'products sidebar',
                  'warehouses sidebar',
                  'inbound-request sidebar',
-                 'role access sidebar',
+                 'role-access sidebar',
 
                  'show-only warehouse',
                  'show-only inventory',
@@ -268,7 +269,7 @@ class PermissionSeeder extends Seeder
 
              'HR Manager' => [
                 'employee sidebar',
-                'role access sidebar',
+                'role-access sidebar',
 
                 'team-only role-access',
                 'crud employee',
