@@ -1,125 +1,146 @@
-@extends('layouts.app')
+<x-app-layout>
+	<div class="py-12">
+		<div class="max-w-7xl my-10 mx-auto sm:px-6 lg:px-8">
+			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+				<div class="p-6 text-gray-900">
+					<h3 class="text-lg font-bold dark:text-white">Inventory Adjustment</h3>
+					<div class="my-6 flex-grow border-t border-gray-300 dark:border-gray-700"></div>
 
-@section('title', 'Adjust Inventory')
+					<form action="{{ route('inventory.adjust') }}" method="POST">
+						@csrf
+						<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+							<div class="form-group">
+								<x-input-label for="warehouse_id">Select Warehouse</x-input-label>
+								<select name="warehouse_id" id="warehouse_id"
+									class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+									required>
+									<option value="">-- Select Warehouse --</option>
+									@foreach($warehouses as $warehouse)
+										<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+									@endforeach
+								</select>
+							</div>
 
-@section('content')
-    <h1>Adjust Inventory</h1>
+							<div class="form-group">
+								<x-input-label for="product_id">Select Product</x-input-label>
+								<select name="product_id" id="product_id"
+									class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+									required>
+									<option value="">-- Select Product --</option>
+									@foreach($products as $product)
+										<option value="{{ $product->id }}">{{ $product->name }}</option>
+									@endforeach
+								</select>
+							</div>
 
-    <form action="{{ route('inventory.adjust') }}" method="POST">
-        @csrf
+							<div class="form-group">
+								<x-input-label for="quantity">Quantity</x-input-label>
+								<x-text-input type="number" name="quantity" class="w-full bg-gray-100 form-control"
+									min="1" required></x-text-input>
+							</div>
 
-        <div class="form-group">
-			<label for="warehouse_id">Select Warehouse</label>
-			<select name="warehouse_id" id="warehouse_id" class="form-control" required>
-				<option value="">-- Select Warehouse --</option>
-				@foreach($warehouses as $warehouse)
-					<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-				@endforeach
-			</select>
-		</div>
-		
-        <div class="form-group">
-            <label for="product_id">Select Product</label>
-            <select name="product_id" id="product_id" class="form-control" required>
-                <option value="">-- Select Product --</option>
-                @foreach($products as $product)
-                    <option value="{{ $product->id }}">{{ $product->name }}</option>
-                @endforeach
-            </select>
-        </div>
+							<div class="form-group">
+								<x-input-label for="transaction_type">Transaction Type</x-input-label>
+								<select name="transaction_type"
+									class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+									required>
+									<option value="Addition">Addition</option>
+									<option value="Reduction">Reduction</option>
+								</select>
+							</div>
 
-        <div class="form-group">
-            <label for="quantity">Quantity</label>
-            <input type="number" name="quantity" class="form-control" min="1" required>
-        </div>
+							<!-- Room Selection -->
+							<div class="form-group">
+								<x-input-label for="room">Room</x-input-label>
+								<select name="room" id="room"
+									class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+									required>
+									<option value="">-- Select Room --</option>
+									<!-- Options will be populated dynamically -->
+								</select>
+							</div>
 
-        <div class="form-group">
-            <label for="transaction_type">Transaction Type</label>
-            <select name="transaction_type" class="form-control" required>
-                <option value="Addition">Addition</option>
-                <option value="Reduction">Reduction</option>
-            </select>
-        </div>
+							<div class="form-group">
+								<x-input-label for="rack">Rack</x-input-label>
+								<select name="rack" id="rack"
+									class="bg-gray-100 w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+									required>
+									<option value="">-- Select Rack --</option>
+									<!-- Options will be populated dynamically -->
+								</select>
+							</div>
 
-        <!-- Room Selection -->
-        <div class="form-group">
-			<label for="room">Room</label>
-			<select name="room" id="room" class="form-control" required>
-				<option value="">-- Select Room --</option>
-				<!-- Options will be populated dynamically -->
-			</select>
-		</div>
+							<div class="form-group">
+								<x-input-label for="notes">Notes</x-input-label>
+								<x-input-textarea name="notes" class="form-control"
+									placeholder="Optional notes"></x-input-textarea>
+							</div>
+						</div>
+						<div class="my-6 flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+						<div class="flex justify-end">
+							<x-primary-button>Adjust Inventory</x-primary-button>
+							<a href="{{ route('inventory.index') }}"
+								class="border rounded border-gray-400 dark:border-gray-700 p-2 ml-3 text-sm hover:underline text-gray-700 dark:text-gray-400">Cancel</a>
+						</div>
+					</form>
 
-		<div class="form-group">
-			<label for="rack">Rack</label>
-			<select name="rack" id="rack" class="form-control" required>
-				<option value="">-- Select Rack --</option>
-				<!-- Options will be populated dynamically -->
-			</select>
-		</div>
+					<!-- JavaScript for Dynamic Rack Filtering based on Room Selection -->
+					<script>
+						document.getElementById('warehouse_id').addEventListener('change', function () {
+							const warehouseId = this.value;
+							const roomSelect = document.getElementById('room');
+							const rackSelect = document.getElementById('rack');
 
-        <div class="form-group">
-            <label for="notes">Notes</label>
-            <textarea name="notes" class="form-control" placeholder="Optional notes"></textarea>
-        </div>
+							roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
+							rackSelect.innerHTML = '<option value="">-- Select Rack --</option>';
 
-        <button type="submit" class="btn btn-primary">Adjust Inventory</button>
-        <a href="{{ route('inventory.index') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+							if (warehouseId) {
+								fetch(`{{ route('inventory.index') }}/get-locations/${warehouseId}`)
+									.then(response => response.json())
+									.then(locations => {
+										// Get unique rooms by filtering out duplicates
+										const uniqueRooms = [...new Set(locations.map(location => location.room))];
 
-    <!-- JavaScript for Dynamic Rack Filtering based on Room Selection -->
-	<script>
-		document.getElementById('warehouse_id').addEventListener('change', function() {
-			const warehouseId = this.value;
-			const roomSelect = document.getElementById('room');
-			const rackSelect = document.getElementById('rack');
+										// Clear the room select options
+										roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
 
-			roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
-			rackSelect.innerHTML = '<option value="">-- Select Rack --</option>';
+										// Populate the room dropdown with unique rooms
+										uniqueRooms.forEach(room => {
+											const option = document.createElement('option');
+											option.value = room;
+											option.textContent = room;
+											roomSelect.appendChild(option);
+										});
+									});
 
-			if (warehouseId) {
-				fetch(`{{ route('inventory.index') }}/get-locations/${warehouseId}`)
-					.then(response => response.json())
-					.then(locations => {
-						// Get unique rooms by filtering out duplicates
-						const uniqueRooms = [...new Set(locations.map(location => location.room))];
-						
-						// Clear the room select options
-						roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
-
-						// Populate the room dropdown with unique rooms
-						uniqueRooms.forEach(room => {
-							const option = document.createElement('option');
-							option.value = room;
-							option.textContent = room;
-							roomSelect.appendChild(option);
+							}
 						});
-					});
 
-			}
-		});
+						document.getElementById('room').addEventListener('change', function () {
+							const selectedRoom = this.value;
+							const rackSelect = document.getElementById('rack');
+							rackSelect.innerHTML = '<option value="">-- Select Rack --</option>';
 
-		document.getElementById('room').addEventListener('change', function() {
-			const selectedRoom = this.value;
-			const rackSelect = document.getElementById('rack');
-			rackSelect.innerHTML = '<option value="">-- Select Rack --</option>';
+							const warehouseId = document.getElementById('warehouse_id').value;
+							if (warehouseId && selectedRoom) {
+								fetch(`{{ route('inventory.index') }}/get-locations/${warehouseId}`)
+									.then(response => response.json())
+									.then(locations => {
+										locations
+											.filter(location => location.room === selectedRoom)
+											.forEach(location => {
+												const option = document.createElement('option');
+												option.value = location.rack;
+												option.textContent = location.rack;
+												rackSelect.appendChild(option);
+											});
+									});
+							}
+						});
+					</script>
 
-			const warehouseId = document.getElementById('warehouse_id').value;
-			if (warehouseId && selectedRoom) {
-				fetch(`{{ route('inventory.index') }}/get-locations/${warehouseId}`)
-					.then(response => response.json())
-					.then(locations => {
-						locations
-							.filter(location => location.room === selectedRoom)
-							.forEach(location => {
-								const option = document.createElement('option');
-								option.value = location.rack;
-								option.textContent = location.rack;
-								rackSelect.appendChild(option);
-							});
-					});
-			}
-		});
-	</script>
-
-@endsection
+				</div>
+			</div>
+		</div>
+	</div>
+</x-app-layout>

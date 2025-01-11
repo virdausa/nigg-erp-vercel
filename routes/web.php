@@ -50,7 +50,7 @@ Route::resource('sales', SalesController::class);
 Route::resource('suppliers', SupplierController::class);
 Route::resource('warehouses', WarehouseController::class);
 
-Route::resource('inventory', InventoryController::class);
+Route::resource('inventory', InventoryController::class)->except(['show']);
 Route::get('/inventory/adjust', [InventoryController::class, 'adjust'])->name('inventory.adjust');
 Route::get('/inventory/history', [InventoryController::class, 'history'])->name('inventory.history');
 

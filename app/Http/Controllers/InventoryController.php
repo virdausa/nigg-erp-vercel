@@ -36,7 +36,7 @@ class InventoryController extends Controller
 		return view('inventory.history', compact('history'));
 	}
 
-	public function showAdjustmentForm()
+	public function adjust()
 	{
 		$products = Product::all();
 		$warehouses = Warehouse::all();
