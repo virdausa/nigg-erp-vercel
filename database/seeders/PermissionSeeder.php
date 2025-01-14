@@ -268,7 +268,7 @@ class PermissionSeeder extends Seeder
              ],
 
              'HR Manager' => [
-                'employee sidebar',
+                'employees sidebar',
                 'role-access sidebar',
 
                 'team-only role-access',
@@ -277,7 +277,7 @@ class PermissionSeeder extends Seeder
             ],
 
             'HR Team' => [
-                'employee sidebar',
+                'employees sidebar',
 
                 'crud employee',
                 'show-only customer-complaint',
