@@ -12,12 +12,16 @@ return new class extends Migration
      */
     public function up()
 	{
-		DB::statement("ALTER TABLE outbound_requests MODIFY COLUMN status ENUM('Requested', 'Pending Confirmation', 'Packing & Shipping', 'In Transit', 'Customer Complaint', 'Ready to Complete', 'Completed') DEFAULT 'Requested'");
+		Schema::table('outbound_requests', function (Blueprint $table) {
+			$table->enum('status', ['Requested', 'Pending Confirmation', 'Packing & Shipping', 'In Transit', 'Customer Complaint', 'Ready to Complete', 'Completed'])->default('Requested')->change();
+		});
 	}
 
 	public function down()
 	{
-		DB::statement("ALTER TABLE outbound_requests MODIFY COLUMN status ENUM('Requested', 'Pending Confirmation', 'Packing & Shipping', 'In Transit', 'Customer Complaint') DEFAULT 'Requested'");
+		Schema::table('outbound_requests', function (Blueprint $table) {
+			$table->enum('status', ['Requested', 'Pending Confirmation', 'Packing & Shipping', 'In Transit', 'Customer Complaint'])->default('Requested')->change();
+		});
 	}
 
 };

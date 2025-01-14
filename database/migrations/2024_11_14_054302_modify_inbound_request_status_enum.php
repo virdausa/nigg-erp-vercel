@@ -9,14 +9,25 @@ class ModifyInboundRequestStatusEnum extends Migration
     public function up()
     {
         Schema::table('inbound_requests', function (Blueprint $table) {
-            DB::statement("ALTER TABLE `inbound_requests` MODIFY `status` ENUM('In Transit', 'Received - Pending Verification', 'Quantity Discrepancy', 'Completed', 'Ready to Complete') NOT NULL");
+            $table->enum('status', [
+                'In Transit',
+                'Received - Pending Verification',
+                'Quantity Discrepancy',
+                'Completed',
+                'Ready to Complete'
+            ])->notNullable()->change();
         });
     }
 
     public function down()
     {
         Schema::table('inbound_requests', function (Blueprint $table) {
-            DB::statement("ALTER TABLE `inbound_requests` MODIFY `status` ENUM('In Transit', 'Received - Pending Verification', 'Quantity Discrepancy', 'Completed') NOT NULL");
+            $table->enum('status', [
+                'In Transit',
+                'Received - Pending Verification',
+                'Quantity Discrepancy',
+                'Completed',
+            ])->notNullable()->change();
         });
     }
 }

@@ -12,8 +12,9 @@ class UpdatePurchaseStatusEnum extends Migration
      */
     public function up()
     {
-        // Modify the 'status' column to include 'Pending Additional Shipment' as a valid value
-        DB::statement("ALTER TABLE purchases MODIFY status ENUM('Planned', 'In Transit', 'Completed', 'Quantity Discrepancy', 'Pending Additional Shipment') DEFAULT 'Planned'");
+        Schema::table('purchases', function (Blueprint $table) {
+            $table->enum('status', ['Planned', 'In Transit', 'Completed', 'Quantity Discrepancy', 'Pending Additional Shipment'])->default('Planned')->change();
+        });
     }
 
     /**
@@ -21,7 +22,8 @@ class UpdatePurchaseStatusEnum extends Migration
      */
     public function down()
     {
-        // Rollback to the previous ENUM definition, removing 'Pending Additional Shipment'
-        DB::statement("ALTER TABLE purchases MODIFY status ENUM('Planned', 'In Transit', 'Completed', 'Quantity Discrepancy') DEFAULT 'Planned'");
+        Schema::table('purchases', function (Blueprint $table) {
+            $table->enum('status', ['Planned', 'In Transit', 'Completed', 'Quantity Discrepancy'])->default('Planned')->change();
+        });
     }
 }

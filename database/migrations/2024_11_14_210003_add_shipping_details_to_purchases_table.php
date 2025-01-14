@@ -15,11 +15,7 @@ return new class extends Migration
 			$table->date('shipped_date')->nullable();
 			$table->string('expedition')->nullable();
 			$table->string('tracking_no')->nullable();
-		});
-
-		// If you're using a strict ENUM field for `status`, you may need to alter it directly in your database or by editing the ENUM values in a future migration
-		Schema::table('purchases', function (Blueprint $table) {
-            DB::statement("ALTER TABLE `purchases` MODIFY `status` ENUM('Planned', 'In Transit', 'Received - Pending Verification', 'Quantity Discrepancy', 'Completed', 'Pending Additional Shipment') NOT NULL");
+            $table->enum('status', ['Planned', 'In Transit', 'Received - Pending Verification', 'Quantity Discrepancy', 'Completed', 'Pending Additional Shipment'])->change();
         });
 	}
 

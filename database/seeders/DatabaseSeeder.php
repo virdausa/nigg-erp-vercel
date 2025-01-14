@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Owner',
-            'email' => 'Owner@gmail.com',
+            'email' => 'owner@gmail.com',
             'role' => 'user',
-            'password' => '$2y$12$yMFFZY8/jMOtJiz3jQAiUuBvYCwbMoUbkNINHoCWQzt/sILsr28oG',
+            'password' => '$2y$12$yMFFZY8/jMOtJiz3jQAiUuBvYCwbMoUbkNINHoCWQzt/sILsr28oG',   // owner123
         ]);
 
         $this->call([
